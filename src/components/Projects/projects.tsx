@@ -15,7 +15,7 @@ import retri from '../../assets/images/retri.png'
 export const listProjects = [
   {
     title: 'Retri Web App',
-    description: `Plataforma web para el alquiler de maquinaria pesada en Colombia. 
+    description: `Plataforma web para el alquiler de maquinaria pesada. 
     Como startup en producción, enfrenté el desafío de desarrollar una solución 
     escalable que se adaptara a los constantes cambios del negocio.`,
 

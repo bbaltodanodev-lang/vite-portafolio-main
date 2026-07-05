@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { HiOutlineAcademicCap } from "react-icons/hi";
 import { RiPresentationLine } from "react-icons/ri";
 import { AcademyCard } from "./AcademyCard";
@@ -16,7 +17,12 @@ const Education = () => {
 
         <div className="grid gap-10 lg:gap-16 lg:grid-cols-2 items-start max-w-7xl mx-auto">
           {/* Academic Education Section */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
             <section className="group relative overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/95 backdrop-blur-md rounded-3xl p-6 lg:p-8 border border-gray-600/40 hover:border-blue-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20">
               {/* Shine Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
@@ -49,10 +55,15 @@ const Education = () => {
                 ))}
               </div>
             </section>
-          </div>
+          </motion.div>
 
           {/* Complementary Courses Section */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          >
             <section className="group relative overflow-hidden bg-gradient-to-br from-purple-900/90 to-black/95 backdrop-blur-md rounded-3xl p-6 lg:p-8 border border-gray-600/40 hover:border-purple-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20">
               {/* Shine Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
@@ -77,13 +88,12 @@ const Education = () => {
                     key={index}
                     institution={course.institution}
                     title={course.title}
-                    url={course.url}
                     category={course.category}
                   />
                 ))}
               </div>
             </section>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

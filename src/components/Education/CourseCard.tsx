@@ -1,10 +1,8 @@
-import { FiExternalLink } from "react-icons/fi";
 import styles from "./styles.module.css";
 
 interface Props {
   institution: string;
   title: string;
-  url: string;
   category?: string;
 }
 
@@ -36,11 +34,8 @@ const getCategoryIcon = (category?: string) => {
 
 export const CourseCard = (props: Props) => {
   return (
-    <a
-      href={props.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`${styles.courseCard} group/course block p-4 bg-gray-800/40 hover:bg-gray-700/60 rounded-xl border border-gray-700/50 hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/10`}
+    <div
+      className={`${styles.courseCard} group/course block p-4 bg-gray-800/40 rounded-xl border border-gray-700/50 transition-all duration-300 hover:bg-gray-700/60 hover:border-purple-400/50 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/10`}
     >
       {/* Shimmer Effect */}
       <div className={styles.shimmer}></div>
@@ -68,16 +63,7 @@ export const CourseCard = (props: Props) => {
             {props.title}
           </p>
         </div>
-
-        {/* External Link Indicator */}
-        <div className="mt-3 flex items-center justify-end gap-2 text-purple-400 opacity-70 group-hover/course:opacity-100 transition-opacity duration-300">
-          <span className="text-xs font-medium">Ver certificado</span>
-          <FiExternalLink
-            size={14}
-            className="group-hover/course:translate-x-1 transition-transform duration-300"
-          />
-        </div>
       </div>
-    </a>
+    </div>
   );
 };

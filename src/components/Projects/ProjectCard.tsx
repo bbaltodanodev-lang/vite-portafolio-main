@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ImageViewer } from "./ImageViewer";
 
 interface ProjectCardProps {
@@ -33,9 +34,17 @@ const ProjectCard = (props: ProjectCardProps) => {
   return (
     <>
       {isModalOpen && <ImageViewer project={project} closeModal={closeModal} />}
-      <article
+      <motion.article
         key={index}
         className="group relative overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/95 backdrop-blur-md rounded-2xl p-4 border border-gray-600/40 hover:border-purple-400/60 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/25 cursor-pointer max-w-sm mx-auto"
+        initial={{ opacity: 0, y: 40, scale: 0.96 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{
+          duration: 0.8,
+          delay: index * 0.08,
+          ease: [0.16, 1, 0.3, 1], // easeOutExpo
+        }}
       >
         {/* Efecto de brillo en hover */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
@@ -107,7 +116,7 @@ const ProjectCard = (props: ProjectCardProps) => {
             </div>
           </section>
         </div>
-      </article>
+      </motion.article>
     </>
   );
 };

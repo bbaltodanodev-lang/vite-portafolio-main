@@ -6,7 +6,7 @@ const Projects = () => {
     <>
       <section className="container pt-20">
         <h2 className="text-center text-3xl py-3 lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-20">
-          Proyectos
+          Proyectos Destacables
         </h2>
 
         {/* Grid de cards compactas */}

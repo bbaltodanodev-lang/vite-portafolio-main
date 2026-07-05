@@ -24,7 +24,7 @@ export default function Skills() {
                 <p className="text-2xl leading-relaxed text-gray-200 group-hover:text-gray-100 transition-colors duration-300">
                   Soy{" "}
                   <span className="font-bold text-purple-300">
-                    Ingeniero en Electrónica y Telecomunicaciones
+                    Ingeniero en Software y Sistemas
                   </span>{" "}
                   con especialización en{" "}
                   <strong className="text-purple-300 font-semibold">
@@ -32,25 +32,25 @@ export default function Skills() {
                   </strong>
                   , diseño de{" "}
                   <strong className="text-purple-300 font-semibold">
-                    infraestructura cloud con AWS
+                    arquitectura web
                   </strong>{" "}
                   y desarrollo{" "}
                   <strong className="text-purple-300 font-semibold">
                     full-stack
                   </strong>
-                  . Actualmente cursando un{" "}
+                  . Actualmente terminando la carrera de {" "}
                   <strong className="text-blue-300 font-semibold">
-                    Máster en Ingeniería de Software
+                    Ingeniería en Sistemas
                   </strong>
                   .
                 </p>
 
                 <p className="text-lg leading-relaxed text-gray-300 group-hover:text-gray-100 transition-colors duration-300">
-                  Experto en{" "}
+                  Con{" "}
                   <strong className="text-purple-300 font-semibold">
-                    Terraform, Docker y CI/CD
+                    6 años de experiencia
                   </strong>
-                  , con amplia experiencia implementando arquitecturas de{" "}
+                  , en el campo de las tecnologías, implementando arquitecturas de{" "}
                   <em className="text-emerald-300 font-medium">
                     microservicios escalables y pipelines automatizados
                   </em>{" "}

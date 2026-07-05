@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { list } from "./listExperience";
 import "./styles.css";
 export const Experience = () => {
@@ -12,7 +13,18 @@ export const Experience = () => {
           <div className="experience-card bg-black bg-opacity-70 hover:bg-opacity-100">
             <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-8 gap-4 p-2 lg:p-10 lg:gap-6 auto-rows-auto">
               {list.map((item, index) => (
-                <div key={index} className={`${item.className} h-fit`}>
+                <motion.div
+                  key={index}
+                  className={`${item.className} h-fit`}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: index * 0.1,
+                    ease: [0.16, 1, 0.3, 1], // easeOutExpo
+                  }}
+                >
                   <article
                     className={
                       "group relative overflow-hidden text-balance border border-gray-600 border-opacity-40 bg-gradient-to-br from-gray-900/80 to-black/90 backdrop-blur-md rounded-2xl p-6 lg:p-8 h-full hover:border-blue-400/60 transition-all duration-500 hover:scale-[1.03] hover:shadow-xl hover:shadow-blue-500/20 hover:from-gray-800/90 hover:to-gray-900/90"
@@ -58,7 +70,7 @@ export const Experience = () => {
                       </ul>
                     </div>
                   </article>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
