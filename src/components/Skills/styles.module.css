@@ -73,8 +73,9 @@
   /* Brillo azul/morado alrededor del círculo, como en la versión anterior. */
   animation: rotateColors 8s ease-in-out infinite;
   /* Fluid size: min 260px on mobile, max 480px on desktop */
-  width: clamp(260px, 45vw, 480px);
-  height: clamp(260px, 45vw, 480px);
+  width: min(100%, clamp(260px, 45vw, 480px));
+  aspect-ratio: 1;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,6 +85,12 @@
 
 .halo > * {
   z-index: 1;
+}
+
+.halo canvas:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 6px;
+  border-radius: 50%;
 }
 
 

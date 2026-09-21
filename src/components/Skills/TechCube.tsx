@@ -15,8 +15,14 @@ interface TechCubeProps {
 
 // Crear un cubo de Rubik 3x3x3
 const GRID_SIZE = 3;
-const CUBE_SIZE = 1.7; // Aumentado de 0.6 a 0.8
-const GAP = 0.2; // Aumentado proporcionalmente
+const CUBE_SIZE = 1.7;
+const GAP = 0.2;
+const TEXTURE_SIZE = 512;
+// El atlas anterior (#280077) se interpretaba como RGB lineal. Convertirlo
+// explícitamente a sRGB conserva ese tono al restaurar el material físico.
+const FACE_COLOR = new THREE.Color()
+  .setRGB(40 / 255, 0, 119 / 255, THREE.LinearSRGBColorSpace)
+  .getStyle();
 
 export const TechCube: React.FC<TechCubeProps> = ({
   technologies,
@@ -27,25 +33,15 @@ export const TechCube: React.FC<TechCubeProps> = ({
   const [faceNames, setFaceNames] = useState<string[]>([]);
   const [webglError, setWebglError] = useState<string | null>(null);
 
-  // Usar useRef para valores que cambian frecuentemente en animación
-  const rotationVelocityRef = useRef({ x: 0, y: 0 });
-  const isDraggingRef = useRef(false);
-  const previousMousePositionRef = useRef<{ x: number; y: number } | null>(
-    null
-  );
-
-  // Referencias para animaciones de cubos individuales
-  const cubesRef = useRef<THREE.Mesh[]>([]);
-  const originalPositionsRef = useRef<THREE.Vector3[]>([]);
-  const originalScalesRef = useRef<THREE.Vector3[]>([]);
-  const animationTargetsRef = useRef<
-    Map<number, { scale: number; offset: THREE.Vector3 }>
-  >(new Map());
-
   useEffect(() => {
     if (!mountRef.current) return;
 
-    console.log("TechCube useEffect started");
+    const mountNode = mountRef.current;
+    let disposed = false;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    const lowPowerDevice = window.matchMedia("(pointer: coarse)").matches || saveData;
+    const animationTargets = new Map<number, { scale: number; offset: THREE.Vector3 }>();
 
     // Escena
     const scene = new THREE.Scene();
@@ -60,7 +56,6 @@ export const TechCube: React.FC<TechCubeProps> = ({
     let handleResize: (() => void) | null = null;
 
     try {
-      console.log("Creating THREE.WebGLRenderer...");
       renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
@@ -69,7 +64,6 @@ export const TechCube: React.FC<TechCubeProps> = ({
         preserveDrawingBuffer: false,
         premultipliedAlpha: false,
       });
-      console.log("THREE.WebGLRenderer created successfully");
     } catch (error) {
       console.error("Failed to create THREE.WebGLRenderer:", error);
       setWebglError(`Error al crear el renderizador WebGL: ${error}`);
@@ -86,10 +80,15 @@ export const TechCube: React.FC<TechCubeProps> = ({
         // Use offsetWidth/offsetHeight — available synchronously after layout
         const w = mountRef.current.offsetWidth;
         const h = mountRef.current.offsetHeight;
-        const size = Math.max(w, h, 1);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.25 : 1.75));
-        renderer.setSize(size, size);
-        camera.aspect = 1;
+        // Retina real en móvil; el límite anterior de 1.25 producía dientes
+        // de sierra incluso aunque los iconos tuvieran más resolución.
+        const deviceRatio = window.devicePixelRatio || 1;
+        const pixelRatio = saveData
+          ? Math.min(deviceRatio, 1.5)
+          : Math.min(Math.max(deviceRatio, 2), lowPowerDevice ? 3 : 2);
+        renderer.setPixelRatio(pixelRatio);
+        renderer.setSize(Math.max(w, 1), Math.max(h, 1), false);
+        camera.aspect = Math.max(w, 1) / Math.max(h, 1);
         camera.updateProjectionMatrix();
         if (renderer.domElement) {
           renderer.domElement.style.cssText = [
@@ -110,23 +109,17 @@ export const TechCube: React.FC<TechCubeProps> = ({
       // Keep a ref so cleanup can disconnect it
       handleResize = () => resizeObserver?.disconnect();
 
-      const lowPowerDevice = window.innerWidth < 768 || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
       renderer.shadowMap.enabled = !lowPowerDevice;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Sombras suaves
-      // Mantener los colores planos del atlas: ACES/exposure levantaba el morado
-      // y hacía que las caras se vieran lavadas en algunas pantallas.
-      // No aplicar exposición cinematográfica: aclara el morado y lo vuelve
-      // magenta en pantallas con brillo alto.
-      renderer.toneMapping = THREE.NoToneMapping;
-      renderer.toneMappingExposure = 1;
-
-      // Configuración de pixel ratio para Safari en dispositivos Retina
-      const pixelRatio = Math.min(window.devicePixelRatio, 2);
-      renderer.setPixelRatio(pixelRatio);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.5;
 
       mountRef.current.appendChild(renderer.domElement);
     } catch (error) {
       console.error("Failed to configure WebGL renderer:", error);
+      handleResize?.();
+      renderer.dispose();
       setWebglError("Error al configurar el renderizador WebGL");
       return;
     }
@@ -147,28 +140,28 @@ export const TechCube: React.FC<TechCubeProps> = ({
       const image64 = "data:image/svg+xml;base64," + svg64;
 
       const canvas = document.createElement("canvas");
-      canvas.width = 256;
-      canvas.height = 256;
+      canvas.width = TEXTURE_SIZE;
+      canvas.height = TEXTURE_SIZE;
       const ctx = canvas.getContext("2d", { alpha: true });
-      const texture = new THREE.Texture(canvas);
+      const texture = new THREE.CanvasTexture(canvas);
 
       if (ctx) {
-        // Color anterior que ya había sido aprobado.
-        // Color original del cubo, antes de las pruebas de color.
-        ctx.fillStyle = "#17005F";
-        ctx.fillRect(0, 0, 256, 256);
+        ctx.fillStyle = FACE_COLOR;
+        ctx.fillRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
 
         // Borde sutil
-        ctx.strokeStyle = "rgba(126, 104, 220, 0.42)";
+        ctx.strokeStyle = "rgba(0, 97, 149, 0.3)";
         ctx.lineWidth = 2;
-        ctx.strokeRect(2, 2, 252, 252);
+        ctx.strokeRect(4, 4, TEXTURE_SIZE - 8, TEXTURE_SIZE - 8);
 
         img.onload = function () {
-          ctx.drawImage(img, 32, 32, 192, 192);
+          if (disposed) return;
+          ctx.drawImage(img, 64, 64, 384, 384);
           texture.needsUpdate = true;
         };
 
         img.onerror = function () {
+          if (disposed) return;
           console.warn("Error loading icon");
           // Dibujar un rectángulo blanco como fallback
           ctx.fillStyle = "white";
@@ -180,9 +173,11 @@ export const TechCube: React.FC<TechCubeProps> = ({
       }
 
       // Configuraciones optimizadas para todos los navegadores
-      texture.generateMipmaps = false;
-      texture.minFilter = THREE.LinearFilter;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.generateMipmaps = true;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
       texture.magFilter = THREE.LinearFilter;
+      texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
       texture.format = THREE.RGBAFormat;
       texture.flipY = false;
 
@@ -194,17 +189,33 @@ export const TechCube: React.FC<TechCubeProps> = ({
       const IconComponent = tech.icon;
       const iconElement = <IconComponent />;
       const texture = renderIconToTexture(iconElement);
-      return new THREE.MeshBasicMaterial({
+      return new THREE.MeshPhysicalMaterial({
         map: texture,
         color: 0xffffff,
         side: THREE.FrontSide,
+        metalness: 0.8,
+        roughness: 0.15,
+        emissive: 0x1a0d3d,
+        emissiveIntensity: 0.03,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.05,
+        reflectivity: 0.9,
+        ior: 1.5,
       });
     });
 
     // Material por defecto con aspecto premium
-    const defaultMaterial = new THREE.MeshBasicMaterial({
-      color: 0x17005f,
+    const defaultMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x5c4ee5,
       side: THREE.FrontSide,
+      metalness: 0.8,
+      roughness: 0.15,
+      emissive: 0x1a0d3d,
+      emissiveIntensity: 0.05,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.05,
+      reflectivity: 0.9,
+      ior: 1.5,
     });
 
     // Crear el cubo de Rubik 3x3x3
@@ -252,23 +263,14 @@ export const TechCube: React.FC<TechCubeProps> = ({
           );
           cubeGroup.add(cube); // Agregar al grupo en lugar de la escena directamente
 
-          // Guardar posiciones y escalas originales
-          originalPositionsRef.current.push(originalPosition.clone());
-          originalScalesRef.current.push(new THREE.Vector3(1, 1, 1));
-
           techIndex++;
         }
       }
     }
 
-    // Guardar referencia a todos los cubos
-    cubesRef.current = cubes;
-
     scene.add(cubeGroup); // Agregar el grupo completo a la escena
 
     setFaceNames(cubeNames);
-
-    const lowPowerDevice = window.innerWidth < 768 || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
     // Iluminación premium para materiales físicos
     const ambientLight = new THREE.AmbientLight(0x404040, 0.3); // Reducida para más contraste
@@ -278,8 +280,9 @@ export const TechCube: React.FC<TechCubeProps> = ({
     const directionalLight = new THREE.DirectionalLight(0xffffff, 3.0); // Más intensa
     directionalLight.position.set(12, 15, 8);
     directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = lowPowerDevice ? 1024 : 2048;
-      directionalLight.shadow.mapSize.height = lowPowerDevice ? 1024 : 2048;
+    directionalLight.shadow.mapSize.set(1024, 1024);
+    directionalLight.shadow.bias = -0.0004;
+    directionalLight.shadow.normalBias = 0.025;
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 100;
     directionalLight.shadow.camera.left = -10;
@@ -325,302 +328,215 @@ export const TechCube: React.FC<TechCubeProps> = ({
     plane.receiveShadow = true;
     scene.add(plane);
 
-    // Event handlers para el drag (mouse y touch)
-    const handleMouseDown = (event: MouseEvent) => {
-      isDraggingRef.current = true;
-      previousMousePositionRef.current = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-    };
-
-    const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        isDraggingRef.current = true;
-        const touch = event.touches[0];
-        previousMousePositionRef.current = {
-          x: touch.clientX,
-          y: touch.clientY,
-        };
-        // Prevenir scroll en móviles
-        event.preventDefault();
-      }
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isDraggingRef.current || !previousMousePositionRef.current) return;
-
-      const deltaX = event.clientX - previousMousePositionRef.current.x;
-      const deltaY = event.clientY - previousMousePositionRef.current.y;
-
-      // Convertir movimiento del mouse a velocidad de rotación
-      const sensitivity = 0.0032;
-      rotationVelocityRef.current = {
-        x: -deltaY * sensitivity,
-        y: deltaX * sensitivity,
-      };
-
-      previousMousePositionRef.current = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      if (
-        !isDraggingRef.current ||
-        !previousMousePositionRef.current ||
-        event.touches.length !== 1
-      )
-        return;
-
-      const touch = event.touches[0];
-      const deltaX = touch.clientX - previousMousePositionRef.current.x;
-      const deltaY = touch.clientY - previousMousePositionRef.current.y;
-
-      // Convertir movimiento del touch a velocidad de rotación
-      const sensitivity = 0.0038;
-      const targetVelocity = {
-        x: -deltaY * sensitivity,
-        y: deltaX * sensitivity,
-      };
-      // Interpolar el gesto evita cambios bruscos cuando el navegador entrega
-      // eventos táctiles con distinta frecuencia.
-      rotationVelocityRef.current = {
-        x: rotationVelocityRef.current.x * 0.65 + targetVelocity.x * 0.35,
-        y: rotationVelocityRef.current.y * 0.65 + targetVelocity.y * 0.35,
-      };
-
-      previousMousePositionRef.current = {
-        x: touch.clientX,
-        y: touch.clientY,
-      };
-
-      // Prevenir scroll en móviles
-      if (event.cancelable) event.preventDefault();
-    };
-
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-      previousMousePositionRef.current = null;
-    };
-
-    const handleTouchEnd = () => {
-      isDraggingRef.current = false;
-      previousMousePositionRef.current = null;
-    };
-
-
-    // Función para animar un cubo individual (hover)
-    const animateCube = (cubeIndex: number, isHovered: boolean) => {
-      if (cubeIndex < 0 || cubeIndex >= cubes.length) return;
-
-      const cube = cubes[cubeIndex];
-      const originalPos = cube.userData.originalPosition;
-
-      // Calcular dirección desde el centro del cubo
-      const direction = originalPos.clone().normalize();
-
-      // Detectar si es móvil (pantalla menor a 768px)
-      const isMobile = window.innerWidth < 768;
-
-      if (isHovered) {
-        // Animación más sutil para móviles
-        const scale = isMobile ? 1.08 : 1.15; // Menor escala en móvil
-        const offsetMultiplier = isMobile ? 0.15 : 0.3; // Menor offset en móvil
-
-        animationTargetsRef.current.set(cubeIndex, {
-          scale: scale,
-          offset: direction.multiplyScalar(offsetMultiplier),
-        });
-      } else {
-        // Volver al estado original
-        animationTargetsRef.current.set(cubeIndex, {
-          scale: 1.0,
-          offset: new THREE.Vector3(0, 0, 0),
-        });
-      }
-    };
-
-    // Añadir event listeners al canvas (mouse y touch)
-    renderer.domElement.addEventListener("mousedown", handleMouseDown);
-    renderer.domElement.addEventListener("mousemove", handleMouseMove);
-    renderer.domElement.addEventListener("mouseup", handleMouseUp);
-    renderer.domElement.addEventListener("mouseleave", handleMouseUp);
-
-    // Event listeners para dispositivos táctiles
-    renderer.domElement.addEventListener("touchstart", handleTouchStart, {
-      passive: false,
-    });
-    renderer.domElement.addEventListener("touchmove", handleTouchMove, {
-      passive: false,
-    });
-    renderer.domElement.addEventListener("touchend", handleTouchEnd);
-    renderer.domElement.addEventListener("touchcancel", handleTouchEnd);
-
-    // Animación con velocidad reducida e interacción
-    let frameId: number;
-    let lastFrame = 0;
-    const animate = (time = 0) => {
-      try {
-        if (lowPowerDevice && time - lastFrame < 33) {
-          frameId = requestAnimationFrame(animate);
-          return;
-        }
-        lastFrame = time;
-        // Rotación automática más lenta cuando no se está arrastrando
-        if (!isDraggingRef.current) {
-          cubeGroup.rotation.x += rotationVelocityRef.current.x + 0.0012;
-          cubeGroup.rotation.y += rotationVelocityRef.current.y + 0.0018;
-
-          // Aplicar fricción para desacelerar gradualmente
-          rotationVelocityRef.current = {
-          x: rotationVelocityRef.current.x * 0.93,
-          y: rotationVelocityRef.current.y * 0.93,
-          };
-        }
-
-        // Animar cubos individuales (hover effects)
-        cubes.forEach((cube, index) => {
-          const target = animationTargetsRef.current.get(index);
-          if (target) {
-            const originalPos = cube.userData.originalPosition;
-
-            // Suavizar la transición hacia el target (más lento en móvil para mejor rendimiento)
-            const isMobile = window.innerWidth < 768;
-            const lerpSpeed = isMobile ? 0.08 : 0.1; // Más suave en móvil
-
-            // Animar escala
-            cube.scale.lerp(
-              new THREE.Vector3(target.scale, target.scale, target.scale),
-              lerpSpeed
-            );
-
-            // Animar posición (offset desde posición original)
-            const targetPosition = originalPos.clone().add(target.offset);
-            cube.position.lerp(targetPosition, lerpSpeed);
-          }
-        });
-
-        renderer.render(scene, camera);
-        frameId = requestAnimationFrame(animate);
-      } catch (error) {
-        console.error("Animation error:", error);
-        setWebglError("Error durante la animación WebGL");
-        cancelAnimationFrame(frameId);
-      }
-    };
-
-    try {
-      console.log("Starting animation...");
-      animate();
-      console.log("Animation started successfully");
-    } catch (error) {
-      console.error("Failed to start animation:", error);
-      setWebglError("Error al iniciar la animación WebGL");
-    }
-
-    // Raycaster para detectar hover y clicks (mouse y touch)
+    // Un único flujo de Pointer Events para mouse y un dedo en pantalla.
+    // No se intercepta wheel: el trackpad sigue desplazando la página.
+    const canvasElement = renderer.domElement;
+    canvasElement.style.touchAction = "none";
+    canvasElement.style.cursor = "grab";
+    canvasElement.tabIndex = 0;
+    canvasElement.setAttribute("aria-label", "Cubo de tecnologías. Arrastra con el mouse o un dedo para girar; también puedes usar las flechas.");
+    const velocity = { x: 0, y: 0 }; // Radianes por segundo, independiente de FPS.
+    let activePointer: number | null = null;
+    let previous = { x: 0, y: 0, time: 0 };
+    let dragged = false;
+    let hoveredIndex: number | null = null;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    let previousHoveredFace: number | null = null;
 
-    function updateMousePosition(clientX: number, clientY: number) {
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    }
-
-    function checkHover() {
-      // No detectar hover si estamos arrastrando
-      if (isDraggingRef.current) return;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(cubes);
-
-      if (intersects.length > 0) {
-        const hoveredCube = intersects[0].object as THREE.Mesh;
-        const currentHoveredFace = hoveredCube.userData.techIndex;
-        setHoveredFace(currentHoveredFace);
-
-        // Si cambió el cubo hover, actualizar animaciones
-        if (previousHoveredFace !== currentHoveredFace) {
-          // Resetear el cubo anterior
-          if (previousHoveredFace !== null) {
-            animateCube(previousHoveredFace, false);
-          }
-          // Animar el nuevo cubo
-          animateCube(currentHoveredFace, true);
-          previousHoveredFace = currentHoveredFace;
-        }
-      } else {
-        setHoveredFace(null);
-        // Resetear hover del cubo anterior
-        if (previousHoveredFace !== null) {
-          animateCube(previousHoveredFace, false);
-        }
-        previousHoveredFace = null;
+    const setHover = (index: number | null) => {
+      if (index === hoveredIndex) return;
+      if (hoveredIndex !== null) {
+        animationTargets.set(hoveredIndex, { scale: 1, offset: new THREE.Vector3() });
       }
-    }
-
-    function onMouseMove(event: MouseEvent) {
-      updateMousePosition(event.clientX, event.clientY);
-      checkHover();
-    }
-
-    function onTouchMove(event: TouchEvent) {
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        updateMousePosition(touch.clientX, touch.clientY);
-        checkHover();
+      hoveredIndex = index;
+      setHoveredFace(index);
+      if (index !== null) {
+        const direction = cubes[index].userData.originalPosition.clone().normalize();
+        animationTargets.set(index, { scale: 1.08, offset: direction.multiplyScalar(0.15) });
       }
-    }
-
-    renderer.domElement.addEventListener("mousemove", onMouseMove);
-
-    // Event listeners para hover táctil
-    renderer.domElement.addEventListener("touchmove", onTouchMove, {
-      passive: true,
-    });
-
-    // Guardar referencia local para cleanup
-    const mountNode = mountRef.current;
-
-    return () => {
-      console.log("Cleaning up TechCube...");
-      // Remove resize observer / listener added during init
-      try {
-        if (handleResize) handleResize(); // calls resizeObserver.disconnect()
-      } catch {
-        /* ignore */
-      }
-      // Cleanup mouse events
-      renderer.domElement.removeEventListener("mousemove", onMouseMove);
-      renderer.domElement.removeEventListener("mousedown", handleMouseDown);
-      renderer.domElement.removeEventListener("mousemove", handleMouseMove);
-      renderer.domElement.removeEventListener("mouseup", handleMouseUp);
-      renderer.domElement.removeEventListener("mouseleave", handleMouseUp);
-
-      // Cleanup touch events
-      renderer.domElement.removeEventListener("touchstart", handleTouchStart);
-      renderer.domElement.removeEventListener("touchmove", handleTouchMove);
-      renderer.domElement.removeEventListener("touchend", handleTouchEnd);
-      renderer.domElement.removeEventListener("touchcancel", handleTouchEnd);
-      renderer.domElement.removeEventListener("touchmove", onTouchMove);
-
-      if (mountNode) mountNode.removeChild(renderer.domElement);
-      cancelAnimationFrame(frameId);
-      cubes.forEach((cube) => {
-        cube.geometry.dispose();
-        if (Array.isArray(cube.material)) {
-          cube.material.forEach((m) => m.dispose());
-        } else {
-          cube.material.dispose();
-        }
-      });
     };
 
-    console.log("TechCube useEffect completed successfully");
+    const pickFace = (event: PointerEvent) => {
+      const rect = canvasElement.getBoundingClientRect();
+      mouse.set(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      raycaster.setFromCamera(mouse, camera);
+      const hit = raycaster.intersectObjects(cubes, false)[0];
+      return hit ? hit.object.userData.techIndex as number : null;
+    };
+
+    const finishDrag = (cancelled = false) => {
+      if (activePointer === null) return;
+      const pointer = activePointer;
+      activePointer = null;
+      if (cancelled || performance.now() - previous.time > 90 || reduceMotion) {
+        velocity.x = 0;
+        velocity.y = 0;
+      }
+      if (canvasElement.hasPointerCapture(pointer)) canvasElement.releasePointerCapture(pointer);
+      canvasElement.style.cursor = "grab";
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!event.isPrimary) {
+        finishDrag(true);
+        return;
+      }
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (activePointer !== null) return;
+      activePointer = event.pointerId;
+      previous = { x: event.clientX, y: event.clientY, time: performance.now() };
+      dragged = false;
+      velocity.x = 0;
+      velocity.y = 0;
+      setHover(null);
+      setHoveredFace(null);
+      canvasElement.setPointerCapture(event.pointerId);
+      canvasElement.style.cursor = "grabbing";
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (activePointer === null) {
+        if (event.pointerType === "mouse" && event.buttons === 0) setHover(pickFace(event));
+        return;
+      }
+      if (event.pointerId !== activePointer) return;
+      const now = performance.now();
+      const deltaX = event.clientX - previous.x;
+      const deltaY = event.clientY - previous.y;
+      const elapsed = Math.max((now - previous.time) / 1000, 1 / 120);
+      const sensitivity = Math.PI / Math.max(canvasElement.clientWidth, 1);
+      const angleX = -deltaY * sensitivity;
+      const angleY = deltaX * sensitivity;
+
+      // El cubo sigue al dedo DURANTE el gesto; antes sólo giraba al soltar.
+      cubeGroup.rotation.x += angleX;
+      cubeGroup.rotation.y += angleY;
+      const blend = 1 - Math.exp(-elapsed / 0.035);
+      velocity.x = THREE.MathUtils.lerp(velocity.x, THREE.MathUtils.clamp(angleX / elapsed, -6, 6), blend);
+      velocity.y = THREE.MathUtils.lerp(velocity.y, THREE.MathUtils.clamp(angleY / elapsed, -6, 6), blend);
+      dragged ||= Math.abs(deltaX) + Math.abs(deltaY) > 2;
+      previous = { x: event.clientX, y: event.clientY, time: now };
+    };
+
+    const handlePointerUp = (event: PointerEvent) => {
+      if (event.pointerId !== activePointer) return;
+      if (!dragged && event.pointerType !== "mouse") setHoveredFace(pickFace(event));
+      finishDrag();
+    };
+    const handlePointerCancel = () => finishDrag(true);
+    const handlePointerLeave = () => {
+      if (activePointer === null) setHover(null);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const directions: Record<string, [number, number]> = {
+        ArrowLeft: [0, -0.16], ArrowRight: [0, 0.16],
+        ArrowUp: [-0.16, 0], ArrowDown: [0.16, 0],
+      };
+      const direction = directions[event.key];
+      if (!direction) return;
+      event.preventDefault();
+      setHover(null);
+      cubeGroup.rotation.x += direction[0];
+      cubeGroup.rotation.y += direction[1];
+    };
+
+    canvasElement.addEventListener("pointerdown", handlePointerDown);
+    canvasElement.addEventListener("pointermove", handlePointerMove);
+    canvasElement.addEventListener("pointerup", handlePointerUp);
+    canvasElement.addEventListener("pointercancel", handlePointerCancel);
+    canvasElement.addEventListener("lostpointercapture", handlePointerCancel);
+    canvasElement.addEventListener("pointerleave", handlePointerLeave);
+    canvasElement.addEventListener("keydown", handleKeyDown);
+
+    let frameId = 0;
+    let lastFrame = 0;
+    let inView = false;
+    const targetScale = new THREE.Vector3();
+    const targetPosition = new THREE.Vector3();
+    const animate = (time: number) => {
+      frameId = 0;
+      if (disposed || !inView || document.hidden) return;
+      const dt = lastFrame ? Math.min((time - lastFrame) / 1000, 0.05) : 1 / 60;
+      lastFrame = time;
+      if (activePointer === null) {
+        cubeGroup.rotation.x += (velocity.x + (reduceMotion ? 0 : 0.072)) * dt;
+        cubeGroup.rotation.y += (velocity.y + (reduceMotion ? 0 : 0.108)) * dt;
+        const friction = Math.exp(-4.3 * dt);
+        velocity.x *= friction;
+        velocity.y *= friction;
+      }
+      const blend = 1 - Math.exp(-8 * dt);
+      for (const [index, target] of animationTargets) {
+        const cube = cubes[index];
+        targetScale.setScalar(target.scale);
+        targetPosition.copy(cube.userData.originalPosition).add(target.offset);
+        cube.scale.lerp(targetScale, blend);
+        cube.position.lerp(targetPosition, blend);
+        if (cube.scale.distanceToSquared(targetScale) < 0.00001 &&
+            cube.position.distanceToSquared(targetPosition) < 0.00001) {
+          cube.scale.copy(targetScale);
+          cube.position.copy(targetPosition);
+          animationTargets.delete(index);
+        }
+      }
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    };
+
+    // Dejar de renderizar cuando el cubo sale de la pantalla libera trabajo
+    // durante el scroll rápido y evita saltos al volver a la sección.
+    const updatePlayback = () => {
+      if (inView && !document.hidden) {
+        if (!frameId) {
+          lastFrame = 0;
+          frameId = requestAnimationFrame(animate);
+        }
+      } else {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+        finishDrag(true);
+        velocity.x = 0;
+        velocity.y = 0;
+      }
+    };
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      updatePlayback();
+    }, { rootMargin: "100px" });
+    visibilityObserver.observe(mountNode);
+    document.addEventListener("visibilitychange", updatePlayback);
+    window.addEventListener("blur", handlePointerCancel);
+
+    return () => {
+      disposed = true;
+      finishDrag(true);
+      cancelAnimationFrame(frameId);
+      handleResize?.();
+      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", updatePlayback);
+      window.removeEventListener("blur", handlePointerCancel);
+      canvasElement.removeEventListener("pointerdown", handlePointerDown);
+      canvasElement.removeEventListener("pointermove", handlePointerMove);
+      canvasElement.removeEventListener("pointerup", handlePointerUp);
+      canvasElement.removeEventListener("pointercancel", handlePointerCancel);
+      canvasElement.removeEventListener("lostpointercapture", handlePointerCancel);
+      canvasElement.removeEventListener("pointerleave", handlePointerLeave);
+      canvasElement.removeEventListener("keydown", handleKeyDown);
+      canvasElement.remove();
+      cubes.forEach((cube) => cube.geometry.dispose());
+      techMaterials.forEach((material) => {
+        material.map?.dispose();
+        material.dispose();
+      });
+      defaultMaterial.dispose();
+      planeGeometry.dispose();
+      planeMaterial.dispose();
+      directionalLight.shadow.dispose();
+      renderer.dispose();
+    };
   }, [technologies, size]);
 
   // Solo mostrar fallback si hay un error específico
@@ -640,13 +556,12 @@ export const TechCube: React.FC<TechCubeProps> = ({
       {/* Canvas de Three.js */}
       <div
         ref={mountRef}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            touchAction: "none",
-          }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+        }}
       />
       {/* Tooltip del nombre de la tecnología — borde animado estilo Experience */}
       <AnimatePresence mode="wait">
