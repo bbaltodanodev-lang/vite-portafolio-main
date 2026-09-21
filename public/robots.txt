@@ -1,0 +1,8 @@
+# robots.txt para portafolio de Bernal Baltodano
+# https://bbaltodano-portafolio.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bbaltodano-portafolio.vercel.app/sitemap.xml

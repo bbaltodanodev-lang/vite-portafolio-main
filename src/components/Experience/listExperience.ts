@@ -1,0 +1,48 @@
+export const list = [
+  {
+    company: "CCDR Santa Cruz",
+    position: "Ingeniero Técnico",
+    period: "2024 – 2026",
+    className: "col-span-1 md:col-span-6 lg:col-span-8 row-span-1",
+    responsabilities: [
+      "Mapeo y optimización de procesos institucionales, identificando flujos manuales, puntos de fricción y oportunidades de digitalización para mejorar la eficiencia operativa.",
+      "Diseño de la arquitectura funcional y de la estructura de datos, definiendo entidades, relaciones, reglas de negocio y mecanismos de gestión para centralizar la información institucional.",
+      "Levantamiento y análisis de requerimientos con los usuarios, transformando necesidades operativas en historias de usuario, criterios de aceptación y funcionalidades priorizadas.",
+      "Diagnóstico y corrección de incidencias mediante depuración, análisis de causa raíz, pruebas de regresión y refactorización, garantizando la estabilidad y mejora continua de la plataforma.",
+      "Desarrollo y mantenimiento de un sistema web administrativo con React, Vite, TypeScript y Tailwind CSS para digitalizar la gestión de membresías, tiquetes e ingresos institucionales. La solución utiliza una base de datos centralizada alojada en el servidor privado de la empresa y una aplicación de escritorio distribuida en los equipos institucionales mediante Electron, permitiendo registrar, sincronizar y contabilizar correctamente todos los ingresos.",
+      "Diseño y modelado de la base de datos relacional, creando tablas, relaciones, restricciones y consultas SQL para gestionar membresías, tiquetes, ingresos y operaciones institucionales. Implementación de validaciones y flujos de persistencia orientados a mantener la integridad, consistencia y trazabilidad de la información.",
+      "Diseño de interfaces responsive y componentes reutilizables, integración de servicios y validación de flujos mediante pruebas funcionales con usuarios finales.",
+      "Diagnóstico de errores, análisis de rendimiento y optimización de consultas, procesos y componentes durante el desarrollo, las pruebas y la puesta en producción.",
+      "Elaboración de documentación técnica sobre arquitectura, contratos de datos, procedimientos de despliegue, configuración del entorno y operación del sistema.",
+      "Coordinación de la instalación, configuración y actualización de la aplicación en los equipos institucionales, validando conectividad, sincronización y disponibilidad del servicio.",
+    ],
+  },
+  {
+    company: "Freelancer",
+    position: "Full Stack Developer",
+    period: "2023 – Presente",
+    className: "col-span-1 md:col-span-6 lg:col-span-4 row-span-1",
+    responsabilities: [
+      "Desarrollo de más de 30 sitios web, landing pages y aplicaciones con React, Next.js, Vite, TypeScript, JavaScript, HTML, CSS y Tailwind CSS.",
+      "Diseño de arquitecturas escalables aplicando Clean Architecture, SOLID, componentes reutilizables y separación de responsabilidades.",
+      "Implementación de APIs y servicios con Node.js, Python y Java, integrando PostgreSQL, SQL Server y Supabase según el proyecto.",
+      "Configuración de servidores Linux y despliegue en VPS, Vercel y Railway, incluyendo variables de entorno, dominios y SSL.",
+      "Automatización de entregas con Git, GitHub, Docker y pipelines CI/CD para mantener despliegues consistentes entre desarrollo y producción.",
+      "Gestión completa del ciclo de vida: levantamiento de requerimientos, UI, desarrollo, pruebas, optimización, documentación y entrega.",
+    ],
+  },
+  {
+    company: "SRE / DevOps",
+    position: "Infraestructura & Automatización",
+    period: "2024 – Presente",
+    className: "col-span-1 md:col-span-6 lg:col-span-4 row-span-1",
+    responsabilities: [
+      "Implementación de servicios contenerizados con Docker y administración de entornos de desarrollo, staging y producción.",
+      "Administración de servidores Linux con Nginx, configuración de SSL, firewalls, backups y políticas de acceso.",
+      "Optimización de rendimiento, disponibilidad y tiempos de despliegue mediante automatización y estandarización de procesos.",
+      "Configuración de monitoreo, logs y alertas para detectar fallos y mantener la continuidad de servicios en producción.",
+      "Uso de GitHub Actions y prácticas CI/CD para validar cambios y publicar versiones de forma controlada.",
+      "Implementación de estrategias de respaldo, recuperación y continuidad operativa para reducir el impacto de fallos en los servicios de producción.",
+    ],
+  },
+];
