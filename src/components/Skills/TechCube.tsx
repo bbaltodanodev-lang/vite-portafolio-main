@@ -17,7 +17,7 @@ interface TechCubeProps {
 const GRID_SIZE = 3;
 const CUBE_SIZE = 1.7;
 const GAP = 0.2;
-const TEXTURE_SIZE = 512;
+const TEXTURE_SIZE = 1024; // 1024 para iconos nítidos en pantallas Retina/AMOLED
 // El canvas 2D opera en sRGB. Three.js convierte la textura de sRGB→lineal
 // antes del pipeline de iluminación + ACES tone mapping, lo que oscurece
 // drásticamente un valor ya oscuro como #280077. Pre-convertimos los valores
@@ -83,12 +83,13 @@ export const TechCube: React.FC<TechCubeProps> = ({
         // Use offsetWidth/offsetHeight — available synchronously after layout
         const w = mountRef.current.offsetWidth;
         const h = mountRef.current.offsetHeight;
-        // Retina real en móvil; el límite anterior de 1.25 producía dientes
-        // de sierra incluso aunque los iconos tuvieran más resolución.
+        // Usar el DPR nativo del dispositivo para máxima nitidez en Retina/AMOLED.
+        // Limitamos a 3× en móvil (suficiente para cualquier pantalla actual)
+        // y a 2× en escritorio para no desperdiciar GPU en monitores 4K.
         const deviceRatio = window.devicePixelRatio || 1;
         const pixelRatio = saveData
           ? Math.min(deviceRatio, 1.5)
-          : Math.min(Math.max(deviceRatio, 2), lowPowerDevice ? 3 : 2);
+          : Math.min(deviceRatio, lowPowerDevice ? 3 : 2);
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(Math.max(w, 1), Math.max(h, 1), false);
         camera.aspect = Math.max(w, 1) / Math.max(h, 1);
@@ -101,6 +102,7 @@ export const TechCube: React.FC<TechCubeProps> = ({
             "width:100%",
             "height:100%",
             "display:block",
+            "will-change:transform", // hint GPU para compositing sin parpadeo
           ].join(";");
         }
       };
@@ -152,14 +154,18 @@ export const TechCube: React.FC<TechCubeProps> = ({
         ctx.fillStyle = FACE_COLOR;
         ctx.fillRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
 
-        // Borde sutil
+        // Borde sutil — grosor y posición proporcionales al tamaño de la textura
         ctx.strokeStyle = "rgba(0, 97, 149, 0.3)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(4, 4, TEXTURE_SIZE - 8, TEXTURE_SIZE - 8);
+        ctx.lineWidth = Math.max(2, TEXTURE_SIZE / 256);
+        const borderInset = Math.max(4, TEXTURE_SIZE / 128);
+        ctx.strokeRect(borderInset, borderInset, TEXTURE_SIZE - borderInset * 2, TEXTURE_SIZE - borderInset * 2);
 
         img.onload = function () {
           if (disposed) return;
-          ctx.drawImage(img, 64, 64, 384, 384);
+          // Margen 1/8 del canvas para que el icono respire bien a cualquier resolución
+          const iconMargin = TEXTURE_SIZE >> 3;
+          const iconSize = TEXTURE_SIZE - iconMargin * 2;
+          ctx.drawImage(img, iconMargin, iconMargin, iconSize, iconSize);
           texture.needsUpdate = true;
         };
 
@@ -196,28 +202,30 @@ export const TechCube: React.FC<TechCubeProps> = ({
         map: texture,
         color: 0xffffff,
         side: THREE.FrontSide,
-        metalness: 0.8,
-        roughness: 0.15,
-        emissive: 0x1a0d3d,
-        emissiveIntensity: 0.03,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.05,
-        reflectivity: 0.9,
+        // metalness bajo para que la textura y el color base sean visibles;
+        // con metalness=0.8 el material refleja el fondo oscuro y oculta el morado.
+        metalness: 0.15,
+        roughness: 0.25,
+        emissive: 0x280077,
+        emissiveIntensity: 0.25,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.1,
+        reflectivity: 0.5,
         ior: 1.5,
       });
     });
 
-    // Material por defecto con aspecto premium
+    // Material por defecto — mismas reglas de metalness que techMaterials
     const defaultMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x5c4ee5,
+      color: 0x280077,
       side: THREE.FrontSide,
-      metalness: 0.8,
-      roughness: 0.15,
-      emissive: 0x1a0d3d,
-      emissiveIntensity: 0.05,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.05,
-      reflectivity: 0.9,
+      metalness: 0.15,
+      roughness: 0.25,
+      emissive: 0x280077,
+      emissiveIntensity: 0.3,
+      clearcoat: 0.4,
+      clearcoatRoughness: 0.1,
+      reflectivity: 0.5,
       ior: 1.5,
     });
 
@@ -418,8 +426,9 @@ export const TechCube: React.FC<TechCubeProps> = ({
       cubeGroup.rotation.x += angleX;
       cubeGroup.rotation.y += angleY;
       const blend = 1 - Math.exp(-elapsed / 0.035);
-      velocity.x = THREE.MathUtils.lerp(velocity.x, THREE.MathUtils.clamp(angleX / elapsed, -6, 6), blend);
-      velocity.y = THREE.MathUtils.lerp(velocity.y, THREE.MathUtils.clamp(angleY / elapsed, -6, 6), blend);
+      // Clamp más amplio (±10) para mayor respuesta táctil al inicio del gesto
+      velocity.x = THREE.MathUtils.lerp(velocity.x, THREE.MathUtils.clamp(angleX / elapsed, -10, 10), blend);
+      velocity.y = THREE.MathUtils.lerp(velocity.y, THREE.MathUtils.clamp(angleY / elapsed, -10, 10), blend);
       dragged ||= Math.abs(deltaX) + Math.abs(deltaY) > 2;
       previous = { x: event.clientX, y: event.clientY, time: now };
     };
@@ -467,7 +476,8 @@ export const TechCube: React.FC<TechCubeProps> = ({
       if (activePointer === null) {
         cubeGroup.rotation.x += (velocity.x + (reduceMotion ? 0 : 0.072)) * dt;
         cubeGroup.rotation.y += (velocity.y + (reduceMotion ? 0 : 0.108)) * dt;
-        const friction = Math.exp(-4.3 * dt);
+        // Fricción más baja (2.5 vs 4.3) = desaceleración más gradual = deslizamiento natural en móvil
+        const friction = Math.exp(-2.5 * dt);
         velocity.x *= friction;
         velocity.y *= friction;
       }
