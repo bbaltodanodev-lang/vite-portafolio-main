@@ -18,8 +18,11 @@ const GRID_SIZE = 3;
 const CUBE_SIZE = 1.7;
 const GAP = 0.2;
 const TEXTURE_SIZE = 512;
-// El atlas anterior (#280077) se interpretaba como RGB lineal. Convertirlo
-// explícitamente a sRGB conserva ese tono al restaurar el material físico.
+// El canvas 2D opera en sRGB. Three.js convierte la textura de sRGB→lineal
+// antes del pipeline de iluminación + ACES tone mapping, lo que oscurece
+// drásticamente un valor ya oscuro como #280077. Pre-convertimos los valores
+// lineales deseados a su representación sRGB para que el resultado visual
+// final sea el morado correcto (~#6B00B4 en canvas → #280077 perceptual).
 const FACE_COLOR = new THREE.Color()
   .setRGB(40 / 255, 0, 119 / 255, THREE.LinearSRGBColorSpace)
   .getStyle();
