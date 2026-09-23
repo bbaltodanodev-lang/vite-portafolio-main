@@ -418,14 +418,21 @@ export const TechCube: React.FC<TechCubeProps> = ({
       const deltaX = event.clientX - previous.x;
       const deltaY = event.clientY - previous.y;
       const elapsed = Math.max((now - previous.time) / 1000, 1 / 120);
-      const sensitivity = Math.PI / Math.max(canvasElement.clientWidth, 1);
+      // Sensibilidad diferenciada: más alta en laptop (mouse) y más alta aún en touch
+      // Mouse: 1.8× para que pequeños movimientos giren el cubo de forma notoria
+      // Touch: 2.5× para que el dedo "agarre" el cubo de inmediato en móvil
+      const isTouch = event.pointerType === "touch";
+      const sensitivityMultiplier = isTouch ? 2.5 : 1.8;
+      const sensitivity = (Math.PI * sensitivityMultiplier) / Math.max(canvasElement.clientWidth, 1);
       const angleX = -deltaY * sensitivity;
       const angleY = deltaX * sensitivity;
 
       // El cubo sigue al dedo DURANTE el gesto; antes sólo giraba al soltar.
       cubeGroup.rotation.x += angleX;
       cubeGroup.rotation.y += angleY;
-      const blend = 1 - Math.exp(-elapsed / 0.035);
+      // Blend más suave en touch (0.05s) para que la inercia siga el dedo
+      // sin saltos; en mouse se mantiene más corto (0.035s) para respuesta inmediata.
+      const blend = 1 - Math.exp(-elapsed / (isTouch ? 0.05 : 0.035));
       // Clamp más amplio (±10) para mayor respuesta táctil al inicio del gesto
       velocity.x = THREE.MathUtils.lerp(velocity.x, THREE.MathUtils.clamp(angleX / elapsed, -10, 10), blend);
       velocity.y = THREE.MathUtils.lerp(velocity.y, THREE.MathUtils.clamp(angleY / elapsed, -10, 10), blend);
