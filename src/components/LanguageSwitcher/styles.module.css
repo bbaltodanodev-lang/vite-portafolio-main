@@ -1,0 +1,259 @@
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+@keyframes globePulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ── Contenedor ───────────────────────────────────────────── */
+.switcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(12, 8, 28, 0.82), rgba(20, 10, 45, 0.88));
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 22px rgba(139, 92, 246, 0.16);
+  transition: box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Borde degradado giratorio — misma técnica que Skills/TechTooltip */
+.switcher::before,
+.switcher::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(var(--angle), #65ffce, #c990ff, #6366f1, #65ffce);
+  animation: spin 7s linear infinite;
+  pointer-events: none;
+}
+
+.switcher::before {
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.55;
+}
+
+.switcher::after {
+  background: linear-gradient(var(--angle), #65ffce, #c990ff, #6366f1);
+  filter: blur(12px);
+  opacity: 0.22;
+  z-index: -1;
+}
+
+.switcher:hover {
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+.switcher:focus-within {
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 2px rgba(196, 181, 253, 0.45),
+    0 0 30px rgba(168, 85, 247, 0.35);
+}
+
+/* ── Globo ────────────────────────────────────────────────── */
+.globe {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  margin-left: 0.2rem;
+  margin-right: 0.1rem;
+  border-radius: 9999px;
+  color: #c4b5fd;
+  background: radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.28), transparent 70%);
+}
+
+.globe svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.6));
+  animation: globePulse 4s ease-in-out infinite;
+}
+
+/* Separador vertical entre globo y opciones */
+.divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.35rem 0.15rem;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(196, 181, 253, 0.35),
+    transparent
+  );
+}
+
+/* ── Opciones ─────────────────────────────────────────────── */
+.track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.option {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgba(233, 229, 255, 0.55);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.option:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.option:active {
+  transform: scale(0.95);
+}
+
+.option:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
+}
+
+.code {
+  position: relative;
+  z-index: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  transition: text-shadow 0.3s ease;
+}
+
+.name {
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
+  font-size: 0.78rem;
+}
+
+/* Estado activo */
+.option[data-active='true'] {
+  color: #fff;
+}
+
+.option[data-active='true'] .code {
+  text-shadow: 0 0 14px rgba(216, 180, 254, 0.75);
+}
+
+.option[data-active='true'] .name {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ── Pulgar deslizante ────────────────────────────────────── */
+.thumb {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 45%, #d946ef 100%);
+  box-shadow:
+    0 6px 18px rgba(139, 92, 246, 0.45),
+    0 2px 6px rgba(217, 70, 239, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Brillo superior que se desplaza con el pulgar */
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.22),
+    transparent 55%
+  );
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 639px) {
+  .switcher {
+    gap: 0.35rem;
+    padding: 0.25rem;
+  }
+
+  .globe {
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-left: 0.1rem;
+  }
+
+  .divider {
+    margin: 0.3rem 0.1rem;
+  }
+
+  .option {
+    padding: 0.45rem 0.6rem;
+  }
+
+  .code {
+    font-size: 0.72rem;
+  }
+}
+
+/* El nombre completo solo tiene sentido cuando hay espacio */
+@media (max-width: 400px) {
+  .name {
+    display: none;
+  }
+}
+
+/* ── Accesibilidad: sin movimiento ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .switcher::before,
+  .switcher::after,
+  .globe svg {
+    animation: none;
+  }
+
+  .switcher,
+  .option,
+  .code {
+    transition: none;
+  }
+
+  .option:active {
+    transform: none;
+  }
+}
