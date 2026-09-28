@@ -4,8 +4,11 @@ import { GithubIcon, LinkedinIcon } from "../Icons";
 import StarsBg from "./Stars";
 import styles from "./styles.module.css";
 import { useParallax } from "./useParallax";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { content } from "../../i18n/content";
 
 export const Banner = () => {
+  const { language } = useLanguage();
   const { homeBannerRef, textStyles, backgroundStyles, sphereStyles } =
     useParallax();
 
@@ -34,7 +37,7 @@ export const Banner = () => {
               Bernal Baltodano
             </h1>
             <p className="text-xl sm:text-2xl font-bold text-white">
-              Ingeniero en Sistemas, Desarrollador Full Stack y Freelancer
+              {content[language].heroSubtitle}
             </p>
           </div>
           <div className="flex items-center justify-center gap-8">
@@ -70,7 +73,7 @@ export const Banner = () => {
             >
               <h1 className="font-extrabold mb-3 text-4xl sm:text-5xl break-words">Bernal Baltodano</h1>
               <p className="text-xl sm:text-2xl font-bold">
-                Ingeniero en Sistemas, Desarrollador Full Stack y Freelancer
+                {content[language].heroSubtitle}
               </p>
             </motion.div>
             <motion.div

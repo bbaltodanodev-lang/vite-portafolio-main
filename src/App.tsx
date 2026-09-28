@@ -5,6 +5,10 @@ import Lenis from "lenis";
 import { Banner } from "./components/Banner";
 import Analytics from "./components/Analytics";
 import Seo from "./components/Seo";
+import LanguageSwitcher from "./components/LanguageSwitcher";
+import { useLanguage } from "./i18n/LanguageContext";
+import { LanguageProvider } from "./i18n/LanguageProvider";
+import { content } from "./i18n/content";
 
 // Below the fold — lazy load para reducir el bundle inicial
 // Three.js (Skills) pesa ~600 KB y solo se descarga cuando el usuario llega
@@ -14,8 +18,12 @@ const Projects = lazy(() => import("./components/Projects"));
 const Education = lazy(() => import("./components/Education"));
 const BMSolution = lazy(() => import("./components/BMSolution"));
 
-function App() {
+function Portfolio() {
+  const { language } = useLanguage();
   useEffect(() => {
+    // En pantallas táctiles, el desplazamiento nativo responde directamente al dedo.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
     // Inicializar Lenis smooth scroll
     const lenis = new Lenis({
       duration: 1.2,
@@ -43,10 +51,12 @@ function App() {
 
   return (
     <main>
+      <LanguageSwitcher />
       <Analytics />
       <Seo
-        title="Bernal Baltodano - Systems Engineer, Full Stack Developer & Freelancer"
-        description="Systems Engineer, Full Stack Developer & Freelancer. +4 años en React, TypeScript, Docker y CI/CD."
+        title={`Bernal Baltodano - ${content[language].heroSubtitle}`}
+        description={language === "es" ? "Ingeniero en Sistemas y Desarrollador Full Stack. Proyectos de desarrollo web, software e infraestructura." : "Systems Engineer and Full Stack Developer. Web, software and infrastructure projects."}
+        language={language}
       />
       {/* Sección hero — carga inmediata para LCP */}
       <Banner />
@@ -61,6 +71,10 @@ function App() {
       </Suspense>
     </main>
   );
+}
+
+function App() {
+  return <LanguageProvider><Portfolio /></LanguageProvider>;
 }
 
 export default App;

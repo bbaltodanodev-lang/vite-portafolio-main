@@ -17,7 +17,7 @@ interface TechCubeProps {
 const GRID_SIZE = 3;
 const CUBE_SIZE = 1.7;
 const GAP = 0.2;
-const TEXTURE_SIZE = 1024; // 1024 para iconos nítidos en pantallas Retina/AMOLED
+const DESKTOP_TEXTURE_SIZE = 1024;
 // El canvas 2D opera en sRGB. Three.js convierte la textura de sRGB→lineal
 // antes del pipeline de iluminación + ACES tone mapping, lo que oscurece
 // drásticamente un valor ya oscuro como #280077. Pre-convertimos los valores
@@ -44,6 +44,7 @@ export const TechCube: React.FC<TechCubeProps> = ({
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
     const lowPowerDevice = window.matchMedia("(pointer: coarse)").matches || saveData;
+    const textureSize = lowPowerDevice ? 512 : DESKTOP_TEXTURE_SIZE;
     const animationTargets = new Map<number, { scale: number; offset: THREE.Vector3 }>();
 
     // Escena
@@ -61,8 +62,8 @@ export const TechCube: React.FC<TechCubeProps> = ({
     try {
       renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true,
-        powerPreference: "default",
+        antialias: !lowPowerDevice,
+        powerPreference: lowPowerDevice ? "low-power" : "default",
         failIfMajorPerformanceCaveat: false,
         preserveDrawingBuffer: false,
         premultipliedAlpha: false,
@@ -83,13 +84,11 @@ export const TechCube: React.FC<TechCubeProps> = ({
         // Use offsetWidth/offsetHeight — available synchronously after layout
         const w = mountRef.current.offsetWidth;
         const h = mountRef.current.offsetHeight;
-        // Usar el DPR nativo del dispositivo para máxima nitidez en Retina/AMOLED.
-        // Limitamos a 3× en móvil (suficiente para cualquier pantalla actual)
-        // y a 2× en escritorio para no desperdiciar GPU en monitores 4K.
+        // En móvil, limitar el renderizado a 2× evita cargar la GPU durante el scroll.
         const deviceRatio = window.devicePixelRatio || 1;
         const pixelRatio = saveData
           ? Math.min(deviceRatio, 1.5)
-          : Math.min(deviceRatio, lowPowerDevice ? 3 : 2);
+          : Math.min(deviceRatio, 2);
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(Math.max(w, 1), Math.max(h, 1), false);
         camera.aspect = Math.max(w, 1) / Math.max(h, 1);
@@ -145,26 +144,26 @@ export const TechCube: React.FC<TechCubeProps> = ({
       const image64 = "data:image/svg+xml;base64," + svg64;
 
       const canvas = document.createElement("canvas");
-      canvas.width = TEXTURE_SIZE;
-      canvas.height = TEXTURE_SIZE;
+      canvas.width = textureSize;
+      canvas.height = textureSize;
       const ctx = canvas.getContext("2d", { alpha: true });
       const texture = new THREE.CanvasTexture(canvas);
 
       if (ctx) {
         ctx.fillStyle = FACE_COLOR;
-        ctx.fillRect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
+        ctx.fillRect(0, 0, textureSize, textureSize);
 
         // Borde sutil — grosor y posición proporcionales al tamaño de la textura
         ctx.strokeStyle = "rgba(0, 97, 149, 0.3)";
-        ctx.lineWidth = Math.max(2, TEXTURE_SIZE / 256);
-        const borderInset = Math.max(4, TEXTURE_SIZE / 128);
-        ctx.strokeRect(borderInset, borderInset, TEXTURE_SIZE - borderInset * 2, TEXTURE_SIZE - borderInset * 2);
+        ctx.lineWidth = Math.max(2, textureSize / 256);
+        const borderInset = Math.max(4, textureSize / 128);
+        ctx.strokeRect(borderInset, borderInset, textureSize - borderInset * 2, textureSize - borderInset * 2);
 
         img.onload = function () {
           if (disposed) return;
           // Margen 1/8 del canvas para que el icono respire bien a cualquier resolución
-          const iconMargin = TEXTURE_SIZE >> 3;
-          const iconSize = TEXTURE_SIZE - iconMargin * 2;
+          const iconMargin = textureSize >> 3;
+          const iconSize = textureSize - iconMargin * 2;
           ctx.drawImage(img, iconMargin, iconMargin, iconSize, iconSize);
           texture.needsUpdate = true;
         };
@@ -174,7 +173,7 @@ export const TechCube: React.FC<TechCubeProps> = ({
           console.warn("Error loading icon");
           // Dibujar un rectángulo blanco como fallback
           ctx.fillStyle = "white";
-          ctx.fillRect(160, 160, 192, 192);
+          ctx.fillRect(textureSize * 0.3125, textureSize * 0.3125, textureSize * 0.375, textureSize * 0.375);
           texture.needsUpdate = true;
         };
 
@@ -342,7 +341,9 @@ export const TechCube: React.FC<TechCubeProps> = ({
     // Un único flujo de Pointer Events para mouse y un dedo en pantalla.
     // No se intercepta wheel: el trackpad sigue desplazando la página.
     const canvasElement = renderer.domElement;
-    canvasElement.style.touchAction = "none";
+    // Permitir que un gesto vertical sobre el cubo desplace la página en móvil.
+    // El giro horizontal sigue disponible y el mouse conserva ambos ejes.
+    canvasElement.style.touchAction = "pan-y";
     canvasElement.style.cursor = "grab";
     canvasElement.tabIndex = 0;
     canvasElement.setAttribute("aria-label", "Cubo de tecnologías. Arrastra con el mouse o un dedo para girar; también puedes usar las flechas.");

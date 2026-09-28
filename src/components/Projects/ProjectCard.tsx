@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ImageViewer } from "./ImageViewer";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { content } from "../../i18n/content";
+import { projectsEn } from "../../i18n/projects.en";
 
 interface ProjectCardProps {
   project: {
@@ -22,6 +25,7 @@ interface ProjectCardProps {
 const ProjectCard = (props: ProjectCardProps) => {
   const { project, index } = props;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { language } = useLanguage();
 
   function openModal(e: React.MouseEvent) {
     e.stopPropagation();
@@ -64,7 +68,7 @@ const ProjectCard = (props: ProjectCardProps) => {
             {/* Icono de zoom */}
             <button
               type="button"
-              aria-label={`Ampliar imagen de ${project.title}`}
+              aria-label={`${content[language].zoom} ${project.title}`}
               onPointerDown={(event) => event.stopPropagation()}
               onPointerUp={(event) => { event.stopPropagation(); setIsModalOpen(true); }}
               onClick={(event) => { event.stopPropagation(); openModal(event); }}
@@ -86,12 +90,12 @@ const ProjectCard = (props: ProjectCardProps) => {
             </button>
           </div>
 
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300">{project.category}</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300">{language === "es" ? project.category : projectsEn[index].category}</p>
           <h3 className="mb-3 text-xl font-bold text-white">{project.title}</h3>
 
           <div className="mb-5 flex-1">
             <p className="text-[15px] text-gray-300 text-pretty leading-7 group-hover:text-gray-100 transition-colors duration-300">
-              {project.description}
+              {language === "es" ? project.description : projectsEn[index].description}
             </p>
           </div>
 

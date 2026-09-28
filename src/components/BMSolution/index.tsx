@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { content } from "../../i18n/content";
 
 const BM_URL = "https://bm-solutionscr.vercel.app/";
 
 const BMSolution = () => {
+  const { language } = useLanguage();
+  const t = content[language];
   return (
     <section className="container pb-24 pt-24" aria-labelledby="bm-solution-title">
       <motion.a
@@ -28,18 +32,16 @@ const BMSolution = () => {
           </div>
 
           <div className="flex-1 text-center lg:text-left">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/80">Mi emprendimiento</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/80">{t.bmEyebrow}</p>
             <h2 id="bm-solution-title" className="bg-gradient-to-r from-cyan-200 via-white to-purple-300 bg-clip-text text-3xl font-bold text-transparent sm:text-5xl">BM Solutions</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">Sistemas web y páginas web profesionales para llevar negocios al siguiente nivel.</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">{t.bmDescription}</p>
             <div className="mt-5 grid max-h-0 grid-cols-1 gap-2 overflow-hidden text-xs text-gray-400 opacity-0 transition-all duration-500 group-hover:max-h-24 group-hover:opacity-100 sm:grid-cols-3">
-              <span className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">Diseño a medida</span>
-              <span className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">Sistemas escalables</span>
-              <span className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">Soporte cercano</span>
+              {t.bmFeatures.map((feature) => <span key={feature} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">{feature}</span>)}
             </div>
           </div>
 
           <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition-all duration-300 group-hover:bg-cyan-300/20 group-hover:gap-3">
-            Ir a ver <span aria-hidden="true">↗</span>
+            {t.bmVisit} <span aria-hidden="true">↗</span>
           </span>
         </div>
       </motion.a>

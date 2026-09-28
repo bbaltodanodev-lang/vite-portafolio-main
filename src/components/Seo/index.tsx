@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import defaultImage from "../../assets/images/bcat-logo.png";
 
 interface SeoProps {
+  language?: "es" | "en";
   title?: string;
   description?: string;
   keywords?: string[];
@@ -18,6 +19,7 @@ interface Seo {
 }
 
 export default function Seo({
+  language = "es",
   title = "Bernal Baltodano - Systems Engineer, Full Stack Developer & Freelancer",
   description = "Systems Engineer, Full Stack Developer & Freelancer. +4 años en React, TypeScript, Docker y CI/CD.",
   imageUrl,
@@ -29,7 +31,7 @@ export default function Seo({
   const seo: Seo = {
     title,
     description,
-    titleTemplate: "%s | Bernal Baltodano - Systems Engineer, Full Stack Developer & Freelancer",
+    titleTemplate: "%s",
     image: imageUrl || defaultImage,
     // url: `${url}${pathname}`
     url: `${url}`,
@@ -99,12 +101,12 @@ export default function Seo({
       "@type": "Person",
       name: "Bernal Baltodano",
     },
-    inLanguage: "es-ES",
+    inLanguage: language === "es" ? "es-CR" : "en-US",
   };
 
   return (
     <Helmet title={seo.title} titleTemplate={seo.titleTemplate}>
-      <html lang="es" />
+      <html lang={language} />
       <meta name="description" content={seo.description} />
       <link rel="canonical" href={seo.url} />
       <meta
@@ -120,20 +122,20 @@ export default function Seo({
 
       {/* Metadatos adicionales */}
       <meta name="author" content="Bernal Baltodano" />
-      <meta name="language" content="Spanish" />
+      <meta name="language" content={language === "es" ? "Spanish" : "English"} />
       <meta name="revisit-after" content="7 days" />
       <meta name="rating" content="general" />
       <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
-      <OpenGraph seo={seo}></OpenGraph>
+      <OpenGraph seo={seo} language={language}></OpenGraph>
       <TwitterCard seo={seo} tagUser="@723Cartman"></TwitterCard>
       <LinkedIn />
     </Helmet>
   );
 }
 
-const OpenGraph = (props: { seo: Seo; appFbId?: string }) => {
-  const { seo, appFbId } = props;
+const OpenGraph = (props: { seo: Seo; language: "es" | "en"; appFbId?: string }) => {
+  const { seo, language, appFbId } = props;
   return (
     <>
       <meta property="og:title" content={seo.title} />
@@ -142,8 +144,8 @@ const OpenGraph = (props: { seo: Seo; appFbId?: string }) => {
         property="og:site_name"
         content="Bernal Baltodano - Systems Engineer, Full Stack Developer & Freelancer"
       />
-      <meta property="og:locale" content="es_ES" />
-      <meta property="og:locale:alternate" content="en_US" />
+      <meta property="og:locale" content={language === "es" ? "es_CR" : "en_US"} />
+      <meta property="og:locale:alternate" content={language === "es" ? "en_US" : "es_CR"} />
       <meta property="og:url" content={seo.url} />
       <meta property="og:image" content={seo.image} />
       <meta property="og:image:secure_url" content={seo.image} />

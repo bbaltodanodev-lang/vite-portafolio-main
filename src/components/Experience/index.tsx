@@ -1,13 +1,17 @@
 import { motion } from "framer-motion";
 import { list } from "./listExperience";
 import "./styles.css";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { content } from "../../i18n/content";
+import { experienceEn } from "../../i18n/experience.en";
 export const Experience = () => {
+  const { language } = useLanguage();
   return (
     <div className="relative max-w-screen overflow-hidden pb-2 bg-black/5 backdrop-blur-xl ">
       <div>
         <section className="container relative z-10 containe min-h-[100vh] pb-10">
           <h2 className="mt-20 text-3xl lg:text-5xl text-center font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-20">
-            Experiencia Laboral
+            {content[language].experienceTitle}
           </h2>
 
           <div className="experience-card bg-black bg-opacity-70 hover:bg-opacity-100">
@@ -41,10 +45,10 @@ export const Experience = () => {
                       </div>
                       <div className="text-left leading-tight flex-grow">
                         <h5 className="text-lg font-semibold text-gray-200 group-hover:text-white transition-colors duration-300">
-                          {item.position}
+                          {language === "es" ? item.position : experienceEn[index].position}
                         </h5>
                         <small className="text-blue-400 font-medium text-sm group-hover:text-blue-300 transition-colors duration-300">
-                          {item.period}
+                          {language === "es" ? item.period : experienceEn[index].period}
                         </small>
                       </div>
                     </div>
@@ -55,7 +59,7 @@ export const Experience = () => {
                           "lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-4 lg:space-y-0"
                           }`}
                       >
-                        {item.responsabilities.map((responsability, index) => (
+                        {(language === "es" ? item.responsabilities : experienceEn[index].responsibilities).map((responsability, index) => (
                           <li
                             className="flex items-start gap-3 text-left group/item"
                             key={index}

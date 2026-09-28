@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoCloseCircleOutline } from "react-icons/io5";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { content } from "../../i18n/content";
 
 export const ImageViewer = ({
   project,
@@ -12,6 +14,7 @@ export const ImageViewer = ({
   };
   closeModal: () => void;
 }) => {
+  const { language } = useLanguage();
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -20,7 +23,7 @@ export const ImageViewer = ({
     return () => { document.body.style.overflow = previous; window.removeEventListener("keydown", onKeyDown); };
   }, [closeModal]);
 
-  const content = (
+  const modalContent = (
     <div
     className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/90 p-3 backdrop-blur-md sm:p-6"
     onClick={closeModal}
@@ -30,7 +33,7 @@ export const ImageViewer = ({
       {/* Botón de cerrar */}
       <button
         type="button"
-        aria-label="Cerrar imagen ampliada"
+        aria-label={content[language].closeImage}
         onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); closeModal(); }}
         onClick={(event) => { event.preventDefault(); event.stopPropagation(); closeModal(); }}
         className="fixed right-4 top-4 z-[10001] grid size-11 place-items-center rounded-full bg-black/90 text-white shadow-lg ring-1 ring-white/20 transition-colors duration-200 hover:bg-purple-600 sm:right-8 sm:top-8"
@@ -58,5 +61,5 @@ export const ImageViewer = ({
   </div>
   );
 
-  return typeof document === "undefined" ? null : createPortal(content, document.body);
+  return typeof document === "undefined" ? null : createPortal(modalContent, document.body);
 };
