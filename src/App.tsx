@@ -8,7 +8,6 @@ import Seo from "./components/Seo";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import { useLanguage } from "./i18n/LanguageContext";
 import { LanguageProvider } from "./i18n/LanguageProvider";
-import { content } from "./i18n/content";
 
 // Below the fold — lazy load para reducir el bundle inicial
 // Three.js (Skills) pesa ~600 KB y solo se descarga cuando el usuario llega
@@ -53,11 +52,7 @@ function Portfolio() {
     <main>
       <LanguageSwitcher />
       <Analytics />
-      <Seo
-        title={`Bernal Baltodano - ${content[language].heroSubtitle}`}
-        description={language === "es" ? "Ingeniero en Sistemas y Desarrollador Full Stack. Proyectos de desarrollo web, software e infraestructura." : "Systems Engineer and Full Stack Developer. Web, software and infrastructure projects."}
-        language={language}
-      />
+      <Seo language={language} />
       {/* Sección hero — carga inmediata para LCP */}
       <Banner />
 
