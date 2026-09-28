@@ -1,31 +1,39 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { DiReact } from "react-icons/di";
+import { FaGolang } from "react-icons/fa6";
+import { FiExternalLink as IconExternalLink } from "react-icons/fi";
+import { SiCss3, SiHtml5, SiJavascript, SiNextdotjs, SiPostgresql, SiSupabase, SiTailwindcss, SiTypescript, SiVite } from "react-icons/si";
+import type { IconType } from "react-icons";
 import { ImageViewer } from "./ImageViewer";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { content } from "../../i18n/content";
-import { projectsEn } from "../../i18n/projects.en";
+import type { Project, Technology } from "../../data/projects";
 
 interface ProjectCardProps {
-  project: {
-    title: string;
-    category?: string;
-    description: string;
-    development?: string;
-    scalability?: string;
-    url: string;
-    domain: string;
-    logo?: React.ReactNode;
-    image: string;
-    tech_icons?: { icon: React.ReactNode; name: string }[];
-  };
+  project: Project;
   index: number;
-  compact?: boolean;
 }
+
+const technologyIcons: Record<Technology, IconType> = {
+  React: DiReact,
+  Vite: SiVite,
+  "Next.js": SiNextdotjs,
+  TypeScript: SiTypescript,
+  "Tailwind CSS": SiTailwindcss,
+  Go: FaGolang,
+  PostgreSQL: SiPostgresql,
+  Supabase: SiSupabase,
+  HTML: SiHtml5,
+  CSS: SiCss3,
+  JavaScript: SiJavascript,
+};
 
 const ProjectCard = (props: ProjectCardProps) => {
   const { project, index } = props;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { language } = useLanguage();
+  const viewProject = language === "es" ? "Ver proyecto" : "View project";
 
   function openModal(e: React.MouseEvent) {
     e.stopPropagation();
@@ -38,7 +46,7 @@ const ProjectCard = (props: ProjectCardProps) => {
 
   return (
     <>
-      {isModalOpen && <ImageViewer project={project} closeModal={closeModal} />}
+      {isModalOpen && <ImageViewer project={{ title: project.name, image: project.image }} closeModal={closeModal} />}
       <motion.article
         key={index}
         className="group relative flex h-full min-h-[570px] flex-col overflow-hidden bg-gradient-to-br from-gray-900/90 to-black/95 backdrop-blur-md rounded-2xl p-5 border border-gray-600/40 hover:border-purple-400/60 transition-shadow duration-500 hover:shadow-xl hover:shadow-purple-500/25 max-w-sm mx-auto"
@@ -56,7 +64,7 @@ const ProjectCard = (props: ProjectCardProps) => {
           >
             <img
               src={project.image}
-              alt={project.title}
+              alt={project.name}
               className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
               loading={index === 0 ? "eager" : "lazy"}
               fetchPriority={index === 0 ? "high" : "auto"}
@@ -68,7 +76,7 @@ const ProjectCard = (props: ProjectCardProps) => {
             {/* Icono de zoom */}
             <button
               type="button"
-              aria-label={`${content[language].zoom} ${project.title}`}
+              aria-label={`${content[language].zoom} ${project.name}`}
               onPointerDown={(event) => event.stopPropagation()}
               onPointerUp={(event) => { event.stopPropagation(); setIsModalOpen(true); }}
               onClick={(event) => { event.stopPropagation(); openModal(event); }}
@@ -90,29 +98,44 @@ const ProjectCard = (props: ProjectCardProps) => {
             </button>
           </div>
 
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300">{language === "es" ? project.category : projectsEn[index].category}</p>
-          <h3 className="mb-3 text-xl font-bold text-white">{project.title}</h3>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-300">{project.category[language]}</p>
+          <h3 className="mb-3 text-xl font-bold text-white">{project.name}</h3>
 
           <div className="mb-5 flex-1">
             <p className="text-[15px] text-gray-300 text-pretty leading-7 group-hover:text-gray-100 transition-colors duration-300">
-              {language === "es" ? project.description : projectsEn[index].description}
+              {project.description[language]}
             </p>
           </div>
 
           {/* Info section más compacta */}
           <section className="relative mt-auto pt-2">
             <div className="flex items-center gap-1.5 flex-wrap">
-              {project?.tech_icons?.map((tech, iconIndex) => (
+              {project.technologies.map((tech) => {
+                const Icon = technologyIcons[tech];
+                return (
                 <div
-                  key={iconIndex}
+                  key={tech}
                   className="group/tech relative rounded-full bg-white/5 px-3 py-1.5 text-[11px] font-medium text-gray-200 ring-1 ring-inset ring-white/10 transition-colors duration-200 hover:ring-purple-400/50"
-                  title={tech.name}
+                  title={tech}
                 >
-                  <span className="flex items-center gap-1.5">{tech.icon}<span>{tech.name}</span></span>
-                  {/* Tooltip */}
+                  <span className="flex items-center gap-1.5"><Icon size={tech === "HTML" || tech === "CSS" || tech === "JavaScript" ? 24 : 26} aria-hidden="true" /><span>{tech}</span></span>
                 </div>
-              ))}
+                );
+              })}
             </div>
+            {project.url && (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${viewProject} ${project.name}`}
+                onPointerDown={(event) => event.stopPropagation()}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-blue-400 transition-colors hover:text-blue-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+              >
+                {viewProject}
+                <IconExternalLink className="size-4" aria-hidden="true" />
+              </a>
+            )}
           </section>
         </div>
       </motion.article>
