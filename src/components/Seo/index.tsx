@@ -6,20 +6,22 @@ const SITE_URL = "https://bbaltodano-portafolio.vercel.app/";
 const seoCopy = {
   es: {
     title: "Bernal Baltodano | Desarrollador Full Stack en Costa Rica",
-    description: "Portafolio de Bernal Baltodano: proyectos de desarrollo web y software, sistemas administrativos y sitios para negocios. React, TypeScript y PostgreSQL.",
+    description: "Bernal Baltodano, desarrollador Full Stack en Costa Rica y fundador de BM Solutions. Conoce su experiencia y proyectos web para empresas y organizaciones.",
     imageAlt: "Portafolio de Bernal Baltodano, desarrollador Full Stack",
     locale: "es_CR",
     language: "es-CR",
     jobTitle: "Desarrollador Full Stack",
+    personDescription: "Desarrollador Full Stack en Costa Rica y fundador de BM Solutions.",
     webDevelopment: "Desarrollo web",
   },
   en: {
     title: "Bernal Baltodano | Full Stack Developer in Costa Rica",
-    description: "Bernal Baltodano's portfolio: web and software projects, administrative systems and websites for businesses. React, TypeScript and PostgreSQL.",
+    description: "Bernal Baltodano is a Full Stack Developer in Costa Rica and founder of BM Solutions. Explore his experience and web projects for businesses and organizations.",
     imageAlt: "Portfolio of Bernal Baltodano, Full Stack Developer",
     locale: "en_US",
     language: "en-US",
     jobTitle: "Full Stack Developer",
+    personDescription: "Full Stack Developer in Costa Rica and founder of BM Solutions.",
     webDevelopment: "Web development",
   },
 } as const;
@@ -51,8 +53,11 @@ export default function Seo({ language }: { language: Language }) {
             "@type": "Person",
             "@id": `${SITE_URL}#bernal-baltodano`,
             name: "Bernal Baltodano",
+            alternateName: "Bernal Baltodano Leiva",
             jobTitle: copy.jobTitle,
+            description: copy.personDescription,
             url: SITE_URL,
+            affiliation: { "@type": "Organization", name: "BM Solutions", url: "https://bm-solutionscr.vercel.app/" },
             sameAs: [
               "https://github.com/bbaltodanodev-lang",
               "https://www.linkedin.com/in/bernal-baltodano",
@@ -65,6 +70,7 @@ export default function Seo({ language }: { language: Language }) {
             name: "Bernal Baltodano",
             url: SITE_URL,
             inLanguage: copy.language,
+            creator: { "@id": `${SITE_URL}#bernal-baltodano` },
           },
           {
             "@type": "WebPage",
@@ -75,6 +81,7 @@ export default function Seo({ language }: { language: Language }) {
             inLanguage: copy.language,
             isPartOf: { "@id": `${SITE_URL}#website` },
             about: { "@id": `${SITE_URL}#bernal-baltodano` },
+            mainEntity: { "@id": `${SITE_URL}#bernal-baltodano` },
           },
         ],
       });

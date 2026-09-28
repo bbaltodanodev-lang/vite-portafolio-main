@@ -64,7 +64,7 @@ const ProjectCard = (props: ProjectCardProps) => {
           >
             <img
               src={project.image}
-              alt={project.name}
+              alt={language === "es" ? `Captura de ${project.name}: ${project.category.es}` : `Screenshot of ${project.name}: ${project.category.en}`}
               className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
               loading={index === 0 ? "eager" : "lazy"}
               fetchPriority={index === 0 ? "high" : "auto"}
