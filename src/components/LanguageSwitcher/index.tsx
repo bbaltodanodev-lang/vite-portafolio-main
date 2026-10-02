@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent, type KeyboardEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { FaGlobeAmericas } from "react-icons/fa";
+
 import { useLanguage, type Language } from "../../i18n/LanguageContext";
 import styles from "./styles.module.css";
 
@@ -70,11 +70,7 @@ export default function LanguageSwitcher() {
           onKeyDown={handleKeyDown}
           className={`${styles.switcher} pointer-events-auto select-none touch-pan-y`}
         >
-          <span className={styles.globe} aria-hidden="true">
-            <FaGlobeAmericas />
-          </span>
 
-          <span className={styles.divider} aria-hidden="true" />
 
           <div className={styles.track} role="group">
             {OPTIONS.map((option) => {
@@ -113,7 +109,6 @@ export default function LanguageSwitcher() {
                   )}
 
                   <span className={styles.code}>{option.code}</span>
-                  <span className={styles.name}>{option.name}</span>
                 </button>
               );
             })}
