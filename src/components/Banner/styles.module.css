@@ -1,28 +1,4 @@
 
-/* Animación Fade In Up */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Clase para aplicar la animación */
-.fadeInUp {
-  animation: fadeInUp 0.15s ease-out forwards;
-}
-
-/* Transición para ocultar contenido estático */
-.hideStaticContent {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  transition: opacity 0.1s ease-out;
-}
-
 .light {
     display: none;
     div{
