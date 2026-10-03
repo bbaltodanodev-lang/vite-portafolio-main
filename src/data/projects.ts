@@ -109,9 +109,9 @@ export const projects: Project[] = [
     name: "Portafolio de Bernal Baltodano",
     url: "https://bbaltodano-portafolio.vercel.app/",
     image: "/projects/bernal-portfolio.png",
-    category: { es: "Fundador y propietario de BM Solutions", en: "Founder and owner of BM Solutions" },
+    category: { es: "Fundador y propietario de Possible", en: "Founder and owner of Possible" },
     description: {
-      es: "Portafolio personal de Bernal Baltodano, fundador y propietario de BM Solutions, ingeniero de sistemas y desarrollador Full Stack. Presenta su experiencia, habilidades, proyectos destacados y las tecnologías que utiliza para crear sistemas empresariales, plataformas POS y sitios web profesionales.",
+      es: "Portafolio personal de Bernal Baltodano, fundador y propietario de Possible, ingeniero de sistemas y desarrollador Full Stack. Presenta su experiencia, habilidades, proyectos destacados y las tecnologías que utiliza para crear sistemas empresariales, plataformas POS y sitios web profesionales.",
       en: "Bernal Baltodano's personal portfolio. As a Systems Engineer and Full Stack Developer, he showcases his experience, skills, featured projects and the technologies he uses to build business systems, POS platforms and professional websites.",
     },
     technologies: ["React", "TypeScript", "Vite", "Tailwind CSS"],

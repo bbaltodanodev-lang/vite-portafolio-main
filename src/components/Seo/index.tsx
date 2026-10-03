@@ -6,22 +6,22 @@ const SITE_URL = "https://bbaltodano-portafolio.vercel.app/";
 const seoCopy = {
   es: {
     title: "Bernal Baltodano | Desarrollador Full Stack en Costa Rica",
-    description: "Bernal Baltodano, desarrollador Full Stack en Costa Rica y fundador de BM Solutions. Conoce su experiencia y proyectos web para empresas y organizaciones.",
+    description: "Bernal Baltodano, desarrollador Full Stack en Costa Rica y fundador de Possible. Conoce su experiencia y proyectos web para empresas y organizaciones.",
     imageAlt: "Portafolio de Bernal Baltodano, desarrollador Full Stack",
     locale: "es_CR",
     language: "es-CR",
     jobTitle: "Desarrollador Full Stack",
-    personDescription: "Desarrollador Full Stack en Costa Rica y fundador de BM Solutions.",
+    personDescription: "Desarrollador Full Stack en Costa Rica y fundador de Possible.",
     webDevelopment: "Desarrollo web",
   },
   en: {
     title: "Bernal Baltodano | Full Stack Developer in Costa Rica",
-    description: "Bernal Baltodano is a Full Stack Developer in Costa Rica and founder of BM Solutions. Explore his experience and web projects for businesses and organizations.",
+    description: "Bernal Baltodano is a Full Stack Developer in Costa Rica and founder of Possible. Explore his experience and web projects for businesses and organizations.",
     imageAlt: "Portfolio of Bernal Baltodano, Full Stack Developer",
     locale: "en_US",
     language: "en-US",
     jobTitle: "Full Stack Developer",
-    personDescription: "Full Stack Developer in Costa Rica and founder of BM Solutions.",
+    personDescription: "Full Stack Developer in Costa Rica and founder of Possible.",
     webDevelopment: "Web development",
   },
 } as const;
@@ -57,7 +57,7 @@ export default function Seo({ language }: { language: Language }) {
             jobTitle: copy.jobTitle,
             description: copy.personDescription,
             url: SITE_URL,
-            affiliation: { "@type": "Organization", name: "BM Solutions", url: "https://bm-solutionscr.vercel.app/" },
+            affiliation: { "@type": "Organization", name: "Possible", url: "https://possible.cr" },
             sameAs: [
               "https://github.com/bbaltodanodev-lang",
               "https://www.linkedin.com/in/bernal-baltodano",

@@ -15,7 +15,7 @@ const Experience = lazy(() => import("./components/Experience"));
 const Skills = lazy(() => import("./components/Skills"));
 const Projects = lazy(() => import("./components/Projects"));
 const Education = lazy(() => import("./components/Education"));
-const BMSolution = lazy(() => import("./components/BMSolution"));
+const Possible = lazy(() => import("./components/Possible"));
 
 function Portfolio() {
   const { language } = useLanguage();
@@ -62,7 +62,7 @@ function Portfolio() {
         <Skills />
         <Projects />
         <Education />
-        <BMSolution />
+        <Possible />
       </Suspense>
     </main>
   );
