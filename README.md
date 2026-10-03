@@ -2,6 +2,8 @@
 
 ## SEO y seguridad del portafolio
 
+Google Analytics 4 se habilita con `VITE_GA_MEASUREMENT_ID=G-...` al compilar. Sin un ID válido no carga la etiqueta. La integración no activa Google Signals ni personalización publicitaria, y la CSP admite los dominios necesarios de Analytics.
+
 El HTML inicial incluye la presentación y enlaces del portafolio antes de cargar React. Los metadatos, el sitemap y los datos estructurados usan la URL pública canónica.
 
 Vercel instala versiones reproducibles con `npm ci`. La CSP bloquea scripts y manejadores inline, salvo el hash del JSON-LD autorizado. Al editar esos datos en `index.html`, ejecuta `npm run security:sync` y guarda también `vercel.json`. La compilación verifica que el hash coincida con el HTML final y falla si quedó desactualizado.
