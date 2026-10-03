@@ -57,7 +57,7 @@ export default function Seo({ language }: { language: Language }) {
             jobTitle: copy.jobTitle,
             description: copy.personDescription,
             url: SITE_URL,
-            affiliation: { "@type": "Organization", name: "Possible", url: "https://possible.cr" },
+            affiliation: { "@type": "Organization", name: "Possible", url: "https://possible-cr.vercel.app" },
             sameAs: [
               "https://github.com/bbaltodanodev-lang",
               "https://www.linkedin.com/in/bernal-baltodano",

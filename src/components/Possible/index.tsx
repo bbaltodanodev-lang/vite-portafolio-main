@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { content } from "../../i18n/content";
 
-const POSSIBLE_URL = "https://possible.cr";
+const POSSIBLE_URL = "https://possible-cr.vercel.app";
 
 const Possible = () => {
   const { language } = useLanguage();
