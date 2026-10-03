@@ -1,5 +1,15 @@
 # React + TypeScript + Vite
 
+## SEO y seguridad del portafolio
+
+El HTML inicial incluye la presentación y enlaces del portafolio antes de cargar React. Los metadatos, el sitemap y los datos estructurados usan la URL pública canónica.
+
+Vercel instala versiones reproducibles con `npm ci`. La CSP bloquea scripts y manejadores inline, salvo el hash del JSON-LD autorizado. Al editar esos datos en `index.html`, ejecuta `npm run security:sync` y guarda también `vercel.json`. La compilación verifica que el hash coincida con el HTML final y falla si quedó desactualizado.
+
+Los servidores locales escuchan solo en `127.0.0.1`. Verificación: `npm run lint`, `npm run build` y `npm audit`.
+
+Rollup está fijado a 4.59.0, una versión sin avisos en la auditoría, porque 4.64.0 bloquea esta compilación y consume memoria durante la optimización del código. Revisar este override antes de actualizarlo.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -11,7 +11,7 @@ const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim();
 
 export default function Analytics() {
   useEffect(() => {
-    if (!measurementId || document.querySelector(`script[data-ga4="${measurementId}"]`)) return;
+    if (!measurementId || !/^G-[A-Z0-9]+$/.test(measurementId) || document.querySelector(`script[data-ga4="${measurementId}"]`)) return;
 
     window.dataLayer = window.dataLayer || [];
     window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
