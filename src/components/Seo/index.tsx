@@ -73,7 +73,7 @@ export default function Seo({ language }: { language: Language }) {
             creator: { "@id": `${SITE_URL}#bernal-baltodano` },
           },
           {
-            "@type": "WebPage",
+            "@type": "ProfilePage",
             "@id": SITE_URL,
             url: SITE_URL,
             name: copy.title,

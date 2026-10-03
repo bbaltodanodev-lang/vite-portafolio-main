@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+
 import { GithubIcon, LinkedinIcon } from "../Icons";
 import StarsBg from "./Stars";
 import styles from "./styles.module.css";
@@ -12,56 +12,11 @@ export const Banner = () => {
   const { homeBannerRef, textStyles, backgroundStyles, sphereStyles } =
     useParallax();
 
-  // Ocultar contenido estático después de que la animación haya comenzado
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const staticContent = document.getElementById("static-content");
-      if (staticContent) {
-        staticContent.classList.add(styles.hideStaticContent);
-      }
-    }, 200); // Ocultar casi inmediatamente, solo esperar el fadeInUp (0.15s)
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <>
-      {/* Contenido estático para LCP - se oculta cuando la animación está lista */}
-      <section
-        className="container h-[900px] relative z-20 lcp-content"
-        id="static-content"
-      >
-        <div className="sticky top-20 max-w-[800px] text-center mx-auto grid gap-18 text-white">
-          <div>
-            <h1 className="font-extrabold mb-3 text-4xl sm:text-5xl lcp-title break-words">
-              Bernal Baltodano
-            </h1>
-            <p className="text-xl sm:text-2xl font-bold text-white">
-              {content[language].heroSubtitle}
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-8">
-            <a
-              href="https://github.com/bbaltodanodev-lang"
-              className="size-20 p-1 rounded-full hover:scale-110 transition-transform hover:shadow-md hover:shadow-gray-300"
-              aria-label="Github"
-            >
-              <GithubIcon className="size-full" />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/bernal-baltodano"
-              className="size-20 p-1 rounded-sm hover:scale-110 transition-transform hover:shadow-md hover:shadow-gray-300"
-              aria-label="LinkedIn"
-            >
-              <LinkedinIcon className="size-full" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Tu animación parallax original - se muestra encima del contenido estático */}
+      {/* Encabezado principal único con animación parallax */}
       <div
-        className={`${styles.fadeInUp} absolute inset-0 z-30`}
+        className="relative z-30"
         id="animated-content"
       >
         <section ref={homeBannerRef} className="container h-[900px] relative">
