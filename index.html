@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/index.css" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="robots"
@@ -83,21 +84,23 @@
     </script>
     <style>
       body { margin: 0; }
-      .seo-fallback { box-sizing: border-box; min-height: 100vh; padding: 5rem 1.25rem 2rem; background: #e0e7ff; color: #08080b; font-family: system-ui, sans-serif; text-align: center; }
+      .seo-fallback { box-sizing: border-box; min-height: 100vh; padding: 5rem 1.25rem 2rem; background: #000; color: #fff; font-family: system-ui, sans-serif; text-align: center; }
       .seo-fallback h1 { margin: 0 0 .75rem; font-size: clamp(2.25rem, 6vw, 3.5rem); }
       .seo-fallback p { max-width: 44rem; margin: 0 auto 1rem; line-height: 1.6; }
-      .seo-fallback a { color: #34207a; margin: 0 .5rem; }
+      .seo-fallback a { color: #c4b5fd; margin: 0 .5rem; }
     </style>
   </head>
   <body>
-    <div id="root">
+    <div id="root"></div>
+    <noscript>
       <main class="seo-fallback">
         <h1>Bernal Baltodano</h1>
         <p>Ingeniero en Sistemas, Desarrollador Full Stack y Freelancer en Costa Rica.</p>
         <p>Fundador de <a href="https://bm-solutionscr.vercel.app/">BM Solutions</a>. Desarrollo sitios web, sistemas administrativos y soluciones digitales para empresas y organizaciones.</p>
         <p><a href="https://github.com/bbaltodanodev-lang">GitHub de Bernal Baltodano</a><a href="https://www.linkedin.com/in/bernal-baltodano">LinkedIn de Bernal Baltodano</a></p>
+        <p>Activa JavaScript para ver el portafolio completo e interactuar con los proyectos.</p>
       </main>
-    </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
