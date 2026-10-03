@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { googleAnalyticsId } from "../../data/analytics";
 
 declare global {
   interface Window {
@@ -7,7 +8,7 @@ declare global {
   }
 }
 
-const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim();
+const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() ?? (import.meta.env.PROD ? googleAnalyticsId : "");
 
 export default function Analytics() {
   useEffect(() => {

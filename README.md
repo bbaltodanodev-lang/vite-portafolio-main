@@ -2,7 +2,7 @@
 
 ## SEO y seguridad del portafolio
 
-Google Analytics 4 se habilita con `VITE_GA_MEASUREMENT_ID=G-...` al compilar. Sin un ID válido no carga la etiqueta. La integración no activa Google Signals ni personalización publicitaria, y la CSP admite los dominios necesarios de Analytics.
+Google Analytics 4 usa el ID `G-0CD3NZJG58` del portafolio en producción, definido en `src/data/analytics.ts`. Se puede reemplazar con `VITE_GA_MEASUREMENT_ID` al compilar; un valor vacío explícito lo desactiva. En desarrollo no carga por defecto. La integración no activa Google Signals ni personalización publicitaria, y la CSP admite los dominios necesarios de Analytics.
 
 El HTML inicial incluye la presentación y enlaces del portafolio antes de cargar React. Los metadatos, el sitemap y los datos estructurados usan la URL pública canónica.
 
