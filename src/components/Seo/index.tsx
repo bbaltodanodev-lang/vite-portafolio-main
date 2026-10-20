@@ -6,7 +6,7 @@ const SITE_URL = "https://bbaltodano-portafolio.vercel.app/";
 const seoCopy = {
   es: {
     title: "Bernal Baltodano | Systems Engineer y Desarrollador Full Stack",
-    description: "Bernal Baltodano, Systems Engineer y desarrollador Full Stack en Costa Rica. Apps web y móviles, bases de datos y creador de Possible Voice. Conoce sus proyectos y experiencia.",
+    description: "Bernal Baltodano, Systems Engineer y desarrollador Full Stack en Costa Rica. Fundador de Possible Studio y creador de Possible Voice: apps web, móviles y bases de datos.",
     imageAlt: "Portafolio de Bernal Baltodano, desarrollador Full Stack",
     locale: "es_CR",
     language: "es-CR",
@@ -16,7 +16,7 @@ const seoCopy = {
   },
   en: {
     title: "Bernal Baltodano | Systems Engineer & Full Stack Developer",
-    description: "Bernal Baltodano is a Systems Engineer and Full Stack Developer in Costa Rica building web and mobile apps, databases and Possible Voice. Explore his projects and experience.",
+    description: "Bernal Baltodano is a Systems Engineer and Full Stack Developer in Costa Rica, founder of Possible Studio and creator of Possible Voice: web apps, mobile apps and databases.",
     imageAlt: "Portfolio of Bernal Baltodano, Full Stack Developer",
     locale: "en_US",
     language: "en-US",

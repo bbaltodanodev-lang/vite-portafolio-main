@@ -3,6 +3,7 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { content } from "../../i18n/content";
 
 const POSSIBLE_URL = "https://possible-cr.vercel.app";
+const POSSIBLE_VOICE_URL = "https://possiblevoice-app.vercel.app/";
 
 const Possible = () => {
   const { language } = useLanguage();
@@ -25,7 +26,7 @@ const Possible = () => {
             <div className="flex h-28 w-full max-w-72 items-center justify-center rounded-2xl border border-white/10 bg-black/30 p-3 shadow-[0_0_35px_rgba(168,85,247,.18)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-[-3deg] sm:h-36 sm:max-w-80">
               <img
                 src="/possible-logo.png"
-                alt="Logo de Possible"
+                alt="Logo de Possible Studio"
                 className="h-full w-full object-contain"
               />
             </div>
@@ -33,7 +34,7 @@ const Possible = () => {
 
           <div className="flex-1 text-center lg:text-left">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/80">{t.possibleEyebrow}</p>
-            <h2 id="possible-title" className="bg-gradient-to-r from-cyan-200 via-white to-purple-300 bg-clip-text text-3xl font-bold text-transparent sm:text-5xl">Possible</h2>
+            <h2 id="possible-title" className="bg-gradient-to-r from-cyan-200 via-white to-purple-300 bg-clip-text text-3xl font-bold text-transparent sm:text-5xl">Possible Studio</h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">{t.possibleDescription}</p>
             <div className="mt-5 grid max-h-0 grid-cols-1 gap-2 overflow-hidden text-xs text-gray-400 opacity-0 transition-all duration-500 group-hover:max-h-24 group-hover:opacity-100 sm:grid-cols-3">
               {t.possibleFeatures.map((feature) => <span key={feature} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">{feature}</span>)}
@@ -45,6 +46,12 @@ const Possible = () => {
           </span>
         </div>
       </motion.a>
+      <p className="mt-6 text-center text-sm text-gray-400">
+        {t.possibleAppLabel}{" "}
+        <a href={POSSIBLE_VOICE_URL} target="_blank" rel="noreferrer" className="font-semibold text-cyan-200 transition-colors hover:text-white">
+          Possible Voice <span aria-hidden="true">↗</span>
+        </a>
+      </p>
     </section>
   );
 };
