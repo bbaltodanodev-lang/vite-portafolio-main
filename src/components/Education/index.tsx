@@ -48,7 +48,7 @@ const Education = () => {
                     <span className="inline-block px-3 py-1 bg-yellow-500/20 text-yellow-300 text-xs font-semibold rounded-full border border-yellow-500/30 mb-2">
                       {t.inProgress}
                     </span>
-                    <h4 className="text-xl font-bold text-white">{t.degree} — UACA</h4>
+                    <h4 className="text-xl font-bold text-white">{t.degree} — UNA</h4>
                     <p className="text-blue-300 font-medium">{t.degree}</p>
                   </div>
                   <div className="text-gray-400 text-sm font-medium whitespace-nowrap bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/50">
@@ -56,12 +56,7 @@ const Education = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
-                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 384 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
-                  Nicoya, Costa Rica
-                </div>
-                
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="mt-3 text-gray-300 text-sm leading-relaxed">
                   {t.educationDescription}
                 </p>
                 <div className="mt-6 grid gap-3 border-t border-white/10 pt-5 sm:grid-cols-3">

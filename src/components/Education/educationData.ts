@@ -1,7 +1,6 @@
 export interface AcademicFormation {
   institution: string;
   degree: string;
-  location: string;
   period: string;
   status: "completed" | "in-progress";
   logo?: string;
@@ -16,9 +15,8 @@ export interface Course {
 
 export const academicFormations: AcademicFormation[] = [
   {
-    institution: "Universidad UACA",
+    institution: "Universidad Nacional (UNA)",
     degree: "Ingeniería en Sistemas",
-    location: "Nicoya, Costa Rica",
     period: "2024 - Presente",
     status: "in-progress",
     description:
