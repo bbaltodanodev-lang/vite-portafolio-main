@@ -5,23 +5,23 @@ const SITE_URL = "https://bbaltodano-portafolio.vercel.app/";
 
 const seoCopy = {
   es: {
-    title: "Bernal Baltodano | Desarrollador Full Stack en Costa Rica",
-    description: "Bernal Baltodano, desarrollador Full Stack en Costa Rica y fundador de Possible. Conoce su experiencia y proyectos web para empresas y organizaciones.",
+    title: "Bernal Baltodano | Systems Engineer y Desarrollador Full Stack",
+    description: "Bernal Baltodano, Systems Engineer y desarrollador Full Stack en Costa Rica. Apps web y móviles, bases de datos y creador de Possible Voice. Conoce sus proyectos y experiencia.",
     imageAlt: "Portafolio de Bernal Baltodano, desarrollador Full Stack",
     locale: "es_CR",
     language: "es-CR",
-    jobTitle: "Desarrollador Full Stack",
-    personDescription: "Desarrollador Full Stack en Costa Rica y fundador de Possible.",
+    jobTitle: "Systems Engineer y Desarrollador Full Stack",
+    personDescription: "Systems Engineer y desarrollador Full Stack en Costa Rica, creador de Possible Voice.",
     webDevelopment: "Desarrollo web",
   },
   en: {
-    title: "Bernal Baltodano | Full Stack Developer in Costa Rica",
-    description: "Bernal Baltodano is a Full Stack Developer in Costa Rica and founder of Possible. Explore his experience and web projects for businesses and organizations.",
+    title: "Bernal Baltodano | Systems Engineer & Full Stack Developer",
+    description: "Bernal Baltodano is a Systems Engineer and Full Stack Developer in Costa Rica building web and mobile apps, databases and Possible Voice. Explore his projects and experience.",
     imageAlt: "Portfolio of Bernal Baltodano, Full Stack Developer",
     locale: "en_US",
     language: "en-US",
-    jobTitle: "Full Stack Developer",
-    personDescription: "Full Stack Developer in Costa Rica and founder of Possible.",
+    jobTitle: "Systems Engineer & Full Stack Developer",
+    personDescription: "Systems Engineer and Full Stack Developer in Costa Rica, creator of Possible Voice.",
     webDevelopment: "Web development",
   },
 } as const;
